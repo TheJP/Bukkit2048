@@ -18,12 +18,7 @@ public class GameState implements IGameState {
 		return field;
 	}
 
-	/**
-	 * Sets the tile at the specified position
-	 * @param x X-Position
-	 * @param y Y-Position
-	 * @param tile Tile value
-	 */
+	@Override
 	public void setTile(int x, int y, byte tile){
 		field[x][y] = tile;
 	}
@@ -32,11 +27,8 @@ public class GameState implements IGameState {
 	public long getScore() {
 		return score;
 	}
-	
-	/**
-	 * Sets the score to the new value
-	 * @param score
-	 */
+
+	@Override
 	public void setScore(long score){
 		this.score = score;
 	}

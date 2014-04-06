@@ -17,10 +17,22 @@ public interface IGameState {
 	 */
 	byte[][] getField();
 	/**
+	 * Sets the tile at the specified position
+	 * @param x X-Position
+	 * @param y Y-Position
+	 * @param tile Tile value
+	 */
+	public void setTile(int x, int y, byte tile);
+	/**
 	 * Returns the current score
 	 * @return score of the current game
 	 */
 	long getScore();
+	/**
+	 * Sets the score to the new value
+	 * @param score
+	 */
+	public void setScore(long score);
 	/**
 	 * Writes the gamestate to an OutputStream
 	 * @param stream
