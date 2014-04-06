@@ -12,6 +12,10 @@ import java.io.IOException;
  */
 public interface IGameState {
 	/**
+	 * Size of a side of the quadratic game field
+	 */
+	public final int FIELD_SIZE = 4;
+	/**
 	 * Returns a 4x4 array of byte values, which represent the field
 	 * @return 4x4 byte array
 	 */

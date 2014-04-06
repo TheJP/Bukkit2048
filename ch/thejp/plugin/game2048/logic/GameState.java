@@ -6,10 +6,6 @@ import java.io.IOException;
 
 public class GameState implements IGameState {
 
-	/**
-	 * Size of a side of the quadratic game field
-	 */
-	public final int FIELD_SIZE = 4;
 	private byte[][] field = new byte[FIELD_SIZE][FIELD_SIZE];
 	private long score = 0;
 
