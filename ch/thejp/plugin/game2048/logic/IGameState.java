@@ -38,6 +38,16 @@ public interface IGameState {
 	 */
 	public void setScore(long score);
 	/**
+	 * Returns true if the game is over (no free tiles left)
+	 * @return
+	 */
+	public boolean isGameOver();
+	/**
+	 * Sets whether the game is over
+	 * @param gameOver true=game over, false=game not yet over
+	 */
+	public void setGameOver(boolean gameOver);
+	/**
 	 * Writes the gamestate to an OutputStream
 	 * @param stream
 	 */

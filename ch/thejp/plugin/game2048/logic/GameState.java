@@ -8,6 +8,7 @@ public class GameState implements IGameState {
 
 	private byte[][] field = new byte[FIELD_SIZE][FIELD_SIZE];
 	private long score = 0;
+	private boolean gameOver = false;
 
 	@Override
 	public byte[][] getField() {
@@ -27,6 +28,16 @@ public class GameState implements IGameState {
 	@Override
 	public void setScore(long score){
 		this.score = score;
+	}
+
+	@Override
+	public boolean isGameOver() {
+		return gameOver;
+	}
+
+	@Override
+	public void setGameOver(boolean gameOver) {
+		this.gameOver = gameOver;
 	}
 
 	@Override
@@ -50,5 +61,4 @@ public class GameState implements IGameState {
 			}
 		}
 	}
-
 }
