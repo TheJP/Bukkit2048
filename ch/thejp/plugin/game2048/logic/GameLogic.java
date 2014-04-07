@@ -137,8 +137,6 @@ public class GameLogic implements IGameLogic {
 		//Add new tile
 		if(moved){
 			addRandomTile();
-			//Set gameover to false, because this is known at this point => So the gameover state doesn't have to be calculated separate
-			gameState.setGameOver(false);
 		}
 	}
 

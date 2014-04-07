@@ -6,27 +6,19 @@ import java.io.IOException;
 
 public class GameState implements IGameState {
 
-	private byte[][] field = new byte[FIELD_SIZE][FIELD_SIZE];
+	private byte[][] field = new byte[FIELD_SIZE+2][FIELD_SIZE+2];
 	private long score = 0;
 	private boolean gameOver = false;
 	private boolean gameOverValid = true;
 
-	/**
-	 * Returns a 4x4 array of byte values, which represent the field
-	 * @return 4x4 byte array
-	 */
-	public byte[][] getField() {
-		return field;
-	}
-
 	@Override
 	public byte getTile(int x, int y) {
-		return field[x][y];
+		return field[x+1][y+1];
 	}
 
 	@Override
 	public void setTile(int x, int y, byte tile){
-		field[x][y] = tile;
+		field[x+1][y+1] = tile;
 		this.gameOverValid = false;
 	}
 
@@ -58,7 +50,7 @@ public class GameState implements IGameState {
 		//Write field
 		for(int x = 0; x < FIELD_SIZE; ++x){
 			for(int y = 0; y < FIELD_SIZE; ++y){
-				stream.writeByte(field[x][y]);
+				stream.writeByte(getTile(x, y));
 			}
 		}
 	}
@@ -69,7 +61,7 @@ public class GameState implements IGameState {
 		//Read field
 		for(int x = 0; x < FIELD_SIZE; ++x){
 			for(int y = 0; y < FIELD_SIZE; ++y){
-				field[x][y] = stream.readByte();
+				setTile(x, y, stream.readByte());
 			}
 		}
 	}
@@ -79,14 +71,19 @@ public class GameState implements IGameState {
 	 * @return gameover state (true=game over)
 	 */
 	private boolean calculateGameOver(){
-		for(int x = 0; x < FIELD_SIZE; ++x){
-			for(int y = 0; y < FIELD_SIZE; ++y){
+		for(int x = 1; x <= FIELD_SIZE; ++x){
+			for(int y = 1; y <= FIELD_SIZE; ++y){
 				if(field[x][y] <= 0){ return false; }
-				else {
-					
+				else if(
+					field[x-1][y] == field[x][y] ||
+				    field[x+1][y] == field[x][y] ||
+				    field[x][y-1] == field[x][y] ||
+				    field[x][y+1] == field[x][y]
+				){
+					return false;
 				}
 			}
 		}
-		return false;
+		return true;
 	}
 }

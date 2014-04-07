@@ -5,9 +5,28 @@ import java.io.IOException;
 import ch.thejp.plugin.game2048.logic.Direction;
 import ch.thejp.plugin.game2048.logic.GameLogic;
 import ch.thejp.plugin.game2048.logic.GameState;
+import ch.thejp.plugin.game2048.logic.IGameState;
 
 public class MainConsole {
 
+	private static void printRow(){
+		for(int x = 0; x < IGameState.FIELD_SIZE; ++x){
+			System.out.print("+--");
+		}
+		System.out.println("+");
+	}
+	
+	private static void printField(IGameState gameState){
+		for(int y = 0; y < GameState.FIELD_SIZE; ++y){
+			printRow();
+			for(int x = 0; x < GameState.FIELD_SIZE; ++x){
+				System.out.print("|" + (gameState.getTile(x, y) < 10 ? " " : "") + gameState.getTile(x, y));
+			}
+			System.out.println("|");
+		}
+		printRow();
+	}
+	
 	public static void main(String[] args) {
 		GameState gameState = new GameState();
 		GameLogic gameLogic = new GameLogic(gameState);
@@ -16,20 +35,7 @@ public class MainConsole {
 		do{
 			try {
 				if(show){
-					for(int y = 0; y < GameState.FIELD_SIZE; ++y){
-						for(int x = 0; x < GameState.FIELD_SIZE; ++x){
-							System.out.print("+--");
-						}
-						System.out.println("+");
-						for(int x = 0; x < GameState.FIELD_SIZE; ++x){
-							System.out.print("|" + (gameState.getField()[x][y] < 10 ? " " : "") + gameState.getField()[x][y]);
-						}
-						System.out.println("|");
-					}
-					for(int x = 0; x < GameState.FIELD_SIZE; ++x){
-						System.out.print("+--");
-					}
-					System.out.println("+");
+					printField(gameState);
 				}
 				//Input
 				show = true;
@@ -45,6 +51,7 @@ public class MainConsole {
 				e.printStackTrace();
 			}
 		}while(cmd != 'q' && !gameState.isGameOver());
+		printField(gameState);
 		System.out.println("Game Over");
 	}
 
