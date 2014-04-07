@@ -16,10 +16,12 @@ public interface IGameState {
 	 */
 	public final int FIELD_SIZE = 4;
 	/**
-	 * Returns a 4x4 array of byte values, which represent the field
-	 * @return 4x4 byte array
+	 * Gets the tile at the specified position
+	 * @param x X-Position
+	 * @param y Y-Position
+	 * @return Tile value
 	 */
-	byte[][] getField();
+	public byte getTile(int x, int y);
 	/**
 	 * Sets the tile at the specified position
 	 * @param x X-Position

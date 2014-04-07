@@ -80,7 +80,7 @@ public class GameLogic implements IGameLogic {
 		List<Point> freeSpaces = new ArrayList<Point>();
 		for(int x = 0; x < GameState.FIELD_SIZE; ++x){
 			for(int y = 0; y < GameState.FIELD_SIZE; ++y){
-				if(gameState.getField()[x][y] == 0){
+				if(gameState.getTile(x, y) == 0){
 					freeSpaces.add(new Point(x, y));
 				}
 			}
@@ -110,23 +110,23 @@ public class GameLogic implements IGameLogic {
 			do{
 				x+=s.smallStepX; y+=s.smallStepY;
 				cond = isNotEnd(x, s.endX) && isNotEnd(y, s.endY);
-				if(cond && gameState.getField()[x][y] > 0){
+				if(cond && gameState.getTile(x, y) > 0){
 					//** Combination situation **//
-					if(gameState.getField()[tileX][tileY] == gameState.getField()[x][y] && gameState.getField()[x][y] < 64) {
-						gameState.getField()[tileX][tileY]++; //Combine tile
+					if(gameState.getTile(tileX, tileY) == gameState.getTile(x, y) && gameState.getTile(x, y) < 64) {
+						gameState.setTile(tileX, tileY, (byte)(gameState.getTile(tileX, tileY)+1)); //Combine tile
 						tileX+=s.smallStepX; tileY+=s.smallStepY;
-						gameState.setScore(gameState.getScore() + gameState.getField()[x][y]); //Add to score
+						gameState.setScore(gameState.getScore() + gameState.getTile(x, y)); //Add to score
 						gameState.setTile(x, y, (byte) 0); //Reset old tile
 						moved = true;
 					}
 					//** Move or stay situation **//
 					else {
-						while((tileX != x || tileY != y) && gameState.getField()[tileX][tileY] != 0){
+						while((tileX != x || tileY != y) && gameState.getTile(tileX, tileY) != 0){
 							tileX+=s.smallStepX; tileY+=s.smallStepY;
 						}
 						//** Move situation **//
-						if(gameState.getField()[tileX][tileY] == 0){
-							gameState.getField()[tileX][tileY] = gameState.getField()[x][y]; //Move
+						if(gameState.getTile(tileX, tileY) == 0){
+							gameState.setTile(tileX, tileY, gameState.getTile(x, y)); //Move
 							gameState.setTile(x, y, (byte) 0); //Reset old tile
 							moved = true;
 						}
@@ -137,6 +137,8 @@ public class GameLogic implements IGameLogic {
 		//Add new tile
 		if(moved){
 			addRandomTile();
+			//Set gameover to false, because this is known at this point => So the gameover state doesn't have to be calculated separate
+			gameState.setGameOver(false);
 		}
 	}
 
