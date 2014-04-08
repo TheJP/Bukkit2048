@@ -89,6 +89,12 @@ public class GameLogic implements IGameLogic {
 		Random r = new Random();
 		Point choosen = freeSpaces.get(r.nextInt(freeSpaces.size()));
 		gameState.setTile(choosen.x, choosen.y, (byte) (r.nextInt(2)+1));
+
+		//Performance improvement (game over doesn't has to be calculated this way):
+		if(freeSpaces.size() >= 2) {
+			//Only one tile was set -> At least one tile is left empty -> game not over yet
+			gameState.setGameOver(false);
+		}
 	}
 
 	@Override
