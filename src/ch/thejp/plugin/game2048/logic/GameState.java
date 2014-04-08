@@ -75,11 +75,12 @@ public class GameState implements IGameState {
 			for(int y = 1; y <= FIELD_SIZE; ++y){
 				if(field[x][y] <= 0){ return false; }
 				else if(
+					field[x][y] < 64 && (
 					field[x-1][y] == field[x][y] ||
 				    field[x+1][y] == field[x][y] ||
 				    field[x][y-1] == field[x][y] ||
 				    field[x][y+1] == field[x][y]
-				){
+				)){
 					return false;
 				}
 			}
