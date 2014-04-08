@@ -58,6 +58,23 @@ lang:
     display-right: Right
     display-down: Down
     display-left: Left
+  huHU:
+    cant-play-on-console: 2048 nem játszható conzolból
+    game-title: 2048
+    game-over: A játék vége. Írd be "/2048 new" hogy új játékot indítsd.
+    new-highscore: <player> új rekordot ért el a 2048 játékban. Rekordokat megnézheted a "/2048 stats" parancsal.
+
+    #hs = highscore
+    hs: Rekordok
+    hs-rank: Helyezés
+    hs-score: Eredmény
+    hs-name: Név
+
+    #tooltip messages (hover over)
+    display-up: Fel
+    display-right: Jobbra
+    display-down: Le
+    display-left: Balra
 
 #This section allows to change displayed inventory items
 #If no custom materials are specified here, defaults will be used
