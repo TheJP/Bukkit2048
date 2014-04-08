@@ -1,0 +1,18 @@
+name: JP2048
+main: ch.thejp.plugin.game2048.JP2048Plugin
+version: 0.0.1
+commands:
+  2048:
+    description: Start game
+    usage: /<command>
+    permission: thejp.2048.play
+    permission-message: Berechtigung <permission> ist notwendig
+permissions:
+  thejp.2048.*:
+    description: Schaltet alle Rechte fuer 2048-Befehle frei
+    default: op
+    children:
+      thejp.2048.play: true
+  thejp.2048.play:
+    descripten: Erlaubt das Spielen von 2048
+    default: true
