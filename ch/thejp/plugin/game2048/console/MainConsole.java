@@ -51,8 +51,8 @@ public class MainConsole {
 				e.printStackTrace();
 			}
 		}while(cmd != 'q' && !gameState.isGameOver());
-		printField(gameState);
 		System.out.println("Game Over");
+		printField(gameState);
 	}
 
 }
