@@ -2,7 +2,10 @@ cmd:
   play: 2048
 
 lang:
-  lang: enUs
+  lang: deCh
   deCh:
-  	
+    cant-play-on-console: 2048 kann momentan nicht auf der Serverkonsole gespielt werden
+    game-title: 2048
   enUs:
+    cant-play-on-console: 2048 can't be played on the server console
+    game-title: 2048
