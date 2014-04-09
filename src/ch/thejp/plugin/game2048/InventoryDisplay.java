@@ -4,9 +4,9 @@ package ch.thejp.plugin.game2048;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
 
-import ch.thejp.plugin.game2048.logic.GameState;
+import ch.thejp.plugin.game2048.logic.Direction;
+import ch.thejp.plugin.game2048.logic.IGameLogic;
 import ch.thejp.plugin.game2048.logic.IGameState;
 
 /**
@@ -26,6 +26,7 @@ public class InventoryDisplay {
 	private ItemStack arrowLeft = new ItemStack(Material.CARROT_ITEM);
 	private ItemStack arrowRight = new ItemStack(Material.ARROW);
 	private ItemStack filler = new ItemStack(Material.STICK);
+	private ItemStack emptyField = new ItemStack(Material.AIR);
 	private Material fieldMaterial = Material.COBBLESTONE;
 
 	public InventoryDisplay(Inventory inventory, IGameState gameState) {
@@ -47,16 +48,40 @@ public class InventoryDisplay {
 		contents[i+2] = contents[i+3] = arrowDown;
 	}
 	
+	/**
+	 * Create the inventory content, which shows the game board
+	 */
 	public void render(){
 		for(int y = 0; y < IGameState.FIELD_SIZE; ++y){
 			int r = (ROW*(y+1)) + 1;
 			for(int x = 0; x < IGameState.FIELD_SIZE; ++x){
 				if(gameState.getTile(x, y) > 0){
 					contents[x + r] = new ItemStack(fieldMaterial, gameState.getTile(x, y));
+				}else{
+					contents[x + r] = emptyField;
 				}
 			}
 		}
 		inventory.setContents(contents);
+	}
+
+	/**
+	 * Perform a click event on the board
+	 * @param gameLogic Object to perform the click on it
+	 * @param slot Slot, in which the player clicked
+	 */
+	public void performClick(IGameLogic gameLogic, int slot){
+		switch (slot) {
+		case 2: case 3:
+			gameLogic.move(Direction.Up); break;
+		case 2*ROW: case 3*ROW:
+			gameLogic.move(Direction.Left); break;
+		case 2*ROW+5: case 3*ROW+5:
+			gameLogic.move(Direction.Right); break;
+		case 5*ROW+2: case 5*ROW+3:
+			gameLogic.move(Direction.Down); break;
+		default: break;
+		}
 	}
 
 	public Inventory getInventory() {

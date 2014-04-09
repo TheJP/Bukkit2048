@@ -13,6 +13,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.inventory.Inventory;
@@ -100,6 +101,9 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 			//Perform click if possible
 			HumanEntity player = event.getWhoClicked();
 			if(games.containsKey(player.getName())){
+				PlayerGame game = games.get(player.getName());
+				game.getDisplay().performClick(game.getGameLogic(), event.getRawSlot());
+				game.getDisplay().render();
 			}
 		}
 	}
