@@ -32,14 +32,24 @@ public class GameLogic implements IGameLogic {
 		new Strategy(0, GameState.FIELD_SIZE - 1, 0, -1), //DOWN
 		new Strategy(0, 0, 1, 0) //LEFT
 	};
-	
+
 	/**
 	 * Constructor needs valid gamestate
 	 * @param gameState
 	 */
 	public GameLogic(IGameState gameState) {
+		this(gameState, true);
+	}
+
+	/**
+	 * Constructor needs valid gamestate
+	 * @param gameState
+	 * @param startNew true=Start new game on given game state (Add initial Tile)
+	 */
+	public GameLogic(IGameState gameState, boolean startNew) {
 		this.gameState = gameState;
-		addRandomTile(); //Add initial tile
+		//Add initial tile
+		if(startNew){ addRandomTile(); }
 	}
 
 	@Override

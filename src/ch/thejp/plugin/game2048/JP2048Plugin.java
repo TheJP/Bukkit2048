@@ -51,6 +51,14 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 		return config.getString(langSection + phrase, phrase);
 	}
 
+	/**
+	 * Save given game state
+	 */
+	private void save(IGameState gameState, String itemName){
+		try { persistencer.write(gameState, itemName); }
+		catch (IOException e) { getLogger().log(Level.WARNING, "Could not write game save file"); }
+	}
+
 	@Override
 	public void onEnable() {
 		getServer().getPluginManager().registerEvents(this, this);
@@ -88,8 +96,19 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 					game.setInventoryView(player.openInventory(game.getDisplay().getInventory()));
 				}else{
 					IGameState gameState = new GameState();
-					IGameLogic gameLogic = new GameLogic(gameState);
-					Inventory inventory = getServer().createInventory(player, 9*6, getPhrase("game-title"));
+					IGameLogic gameLogic;
+					//Is a save file available?
+					if(persistencer.isAvailable(player.getName())){
+						//Yes: Read save file
+						try { persistencer.read(gameState, player.getName()); }
+						catch (IOException e) { getLogger().log(Level.WARNING, "Could not read game save file"); return true; }
+						gameLogic = new GameLogic(gameState, false);
+					}else{
+						gameLogic = new GameLogic(gameState);
+						save(gameState, player.getName());
+					}
+					Inventory inventory = getServer().createInventory(
+							player, InventoryDisplay.COLS*InventoryDisplay.ROWS, getPhrase("game-title"));
 					InventoryDisplay display = new InventoryDisplay(inventory, gameState);
 					display.render();
 					InventoryView inventoryView = player.openInventory(inventory);
@@ -111,11 +130,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 				game.getDisplay().performClick(game.getGameLogic(), event.getRawSlot());
 				game.getDisplay().render();
 				//Save game state
-				try {
-					persistencer.write(game.getGameLogic().getGameState(), player.getName());
-				} catch (IOException e) {
-					getLogger().log(Level.WARNING, "Could not write game save file");
-				}
+				save(game.getGameLogic().getGameState(), player.getName());
 			}
 		}
 	}

@@ -15,7 +15,8 @@ import ch.thejp.plugin.game2048.logic.IGameState;
  */
 public class InventoryDisplay {
 
-	public static final int ROW = 9;
+	public static final int COLS = 9;
+	public static final int ROWS = 6;
 
 	private Inventory inventory;
 	private IGameState gameState;
@@ -32,18 +33,21 @@ public class InventoryDisplay {
 	public InventoryDisplay(Inventory inventory, IGameState gameState) {
 		this.inventory = inventory;
 		this.gameState = gameState;
-		this.contents = new ItemStack[ROW*6];
+		this.contents = new ItemStack[COLS*6];
 		initContents();
 	}
 	
+	/**
+	 * Initialize frame of the display
+	 */
 	private void initContents(){
 		contents[0] = contents[1] = contents[4] = contents[5] = filler;
 		contents[2] = contents[3] = arrowUp;
-		int i = ROW;
-		contents[i] = contents[i+5] = filler; i+=ROW;
-		contents[i] = contents[i+ROW] = arrowLeft;
-		contents[i+5] = contents[i+ROW+5] = arrowRight; i+=ROW+ROW;
-		contents[i] = contents[i+5] = filler; i+=ROW;
+		int i = COLS;
+		contents[i] = contents[i+5] = filler; i+=COLS;
+		contents[i] = contents[i+COLS] = arrowLeft;
+		contents[i+5] = contents[i+COLS+5] = arrowRight; i+=COLS+COLS;
+		contents[i] = contents[i+5] = filler; i+=COLS;
 		contents[i] = contents[i+1] = contents[i+4] = contents[i+5] = filler;
 		contents[i+2] = contents[i+3] = arrowDown;
 	}
@@ -53,7 +57,7 @@ public class InventoryDisplay {
 	 */
 	public void render(){
 		for(int y = 0; y < IGameState.FIELD_SIZE; ++y){
-			int r = (ROW*(y+1)) + 1;
+			int r = (COLS*(y+1)) + 1;
 			for(int x = 0; x < IGameState.FIELD_SIZE; ++x){
 				if(gameState.getTile(x, y) > 0){
 					contents[x + r] = new ItemStack(fieldMaterial, gameState.getTile(x, y));
@@ -74,11 +78,11 @@ public class InventoryDisplay {
 		switch (slot) {
 		case 2: case 3:
 			gameLogic.move(Direction.Up); break;
-		case 2*ROW: case 3*ROW:
+		case 2*COLS: case 3*COLS:
 			gameLogic.move(Direction.Left); break;
-		case 2*ROW+5: case 3*ROW+5:
+		case 2*COLS+5: case 3*COLS+5:
 			gameLogic.move(Direction.Right); break;
-		case 5*ROW+2: case 5*ROW+3:
+		case 5*COLS+2: case 5*COLS+3:
 			gameLogic.move(Direction.Down); break;
 		default: break;
 		}
