@@ -25,4 +25,11 @@ public interface IPersistencer {
 	 * @throws IOException 
 	 */
 	public void read(IGameState gameState, String itemName) throws IOException;
+	/**
+	 * Checks if the Item with given identifier is available
+	 * @param itemName Name of the searched item
+	 * @return true=available, false otherwise
+	 * @throws IOException
+	 */
+	public boolean isAvailable(String itemName);
 }

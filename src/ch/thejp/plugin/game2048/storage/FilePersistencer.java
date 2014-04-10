@@ -16,6 +16,7 @@ import ch.thejp.plugin.game2048.logic.IGameState;
 public class FilePersistencer implements IPersistencer {
 
 	private String path;
+	public static final String ENDING = ".bin"; 
 
 	/**
 	 * Constructor with path
@@ -29,7 +30,7 @@ public class FilePersistencer implements IPersistencer {
 
 	@Override
 	public void write(IGameState gameState, String itemName) throws IOException {
-		DataOutputStream writer = new DataOutputStream(new FileOutputStream(path + itemName + ".bin", false));
+		DataOutputStream writer = new DataOutputStream(new FileOutputStream(path + itemName + ENDING, false));
 		try{
 			gameState.write(writer);
 		}finally{
@@ -39,11 +40,16 @@ public class FilePersistencer implements IPersistencer {
 
 	@Override
 	public void read(IGameState gameState, String itemName) throws IOException {
-		DataInputStream reader = new DataInputStream(new FileInputStream(path + itemName + ".bin"));
+		DataInputStream reader = new DataInputStream(new FileInputStream(path + itemName + ENDING));
 		try{
 			gameState.read(reader);
 		}finally{
 			reader.close();
 		}
+	}
+
+	@Override
+	public boolean isAvailable(String itemName) {
+		return new File(path + itemName + ENDING).isFile();
 	}
 }
