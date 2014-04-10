@@ -1,8 +1,10 @@
 package ch.thejp.plugin.game2048;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -22,6 +24,8 @@ import ch.thejp.plugin.game2048.logic.GameLogic;
 import ch.thejp.plugin.game2048.logic.GameState;
 import ch.thejp.plugin.game2048.logic.IGameLogic;
 import ch.thejp.plugin.game2048.logic.IGameState;
+import ch.thejp.plugin.game2048.storage.FilePersistencer;
+import ch.thejp.plugin.game2048.storage.IPersistencer;
 
 /**
  * View-code of the 2048 Plugin 
@@ -32,6 +36,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 	private Permission permissionPlay = new Permission("thejp.2048.play");
 	//Map Playername->Game
 	private Map<String, PlayerGame> games = new HashMap<String, PlayerGame>();
+	private IPersistencer persistencer;
 
 	//** Configs **//
 	private final String configFilename = "plugins/2048.yml";
@@ -57,6 +62,11 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 		config = YamlConfiguration.loadConfiguration(new File(configFilename));
 		langSection = "lang." + config.getString("lang.lang", "enUs") + ".";
 		commandPlay = config.getString("cmd.play", "2048");
+		//Create Persistencer
+		String storagePath = config.getString("storage.path", "plugins/2048/");
+		File storage = new File(storagePath);
+		storage.mkdirs(); //Create folder structure if it doesn' exist
+		persistencer = new FilePersistencer(storage.getAbsolutePath() + File.separatorChar);
 	}
 	
 	@Override
@@ -100,7 +110,12 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 				PlayerGame game = games.get(player.getName());
 				game.getDisplay().performClick(game.getGameLogic(), event.getRawSlot());
 				game.getDisplay().render();
-				//TODO: Save state
+				//Save game state
+				try {
+					persistencer.write(game.getGameLogic().getGameState(), player.getName());
+				} catch (IOException e) {
+					getLogger().log(Level.WARNING, "Could not write game save file");
+				}
 			}
 		}
 	}

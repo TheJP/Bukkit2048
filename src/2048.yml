@@ -1,3 +1,6 @@
+storage:
+  path: plugins/2048/
+
 cmd:
   play: 2048
 

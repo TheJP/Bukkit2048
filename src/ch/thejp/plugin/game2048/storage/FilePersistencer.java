@@ -2,6 +2,7 @@ package ch.thejp.plugin.game2048.storage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -22,7 +23,7 @@ public class FilePersistencer implements IPersistencer {
 	 */
 	public FilePersistencer(String path) {
 		//Path has to end with the path separator
-		assert path.charAt(path.length()-1) == '/' : "Invalid path";
+		assert path.charAt(path.length()-1) == File.separatorChar : "Invalid path";
 		this.path = path;
 	}
 
