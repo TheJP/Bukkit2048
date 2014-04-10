@@ -3,7 +3,6 @@ package ch.thejp.plugin.game2048;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -13,11 +12,8 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -104,6 +100,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 				PlayerGame game = games.get(player.getName());
 				game.getDisplay().performClick(game.getGameLogic(), event.getRawSlot());
 				game.getDisplay().render();
+				//TODO: Save state
 			}
 		}
 	}
