@@ -1,6 +1,9 @@
 package ch.thejp.plugin.game2048;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -29,6 +32,8 @@ public class InventoryDisplay {
 	private ItemStack filler = new ItemStack(Material.STICK);
 	private ItemStack emptyField = new ItemStack(Material.AIR);
 	private Material fieldMaterial = Material.COBBLESTONE;
+	private Material scoreMaterial = Material.STICK;
+	private Material zeroMaterial = Material.EGG;
 
 	public InventoryDisplay(Inventory inventory, IGameState gameState) {
 		this.inventory = inventory;
@@ -51,11 +56,28 @@ public class InventoryDisplay {
 		contents[i] = contents[i+1] = contents[i+4] = contents[i+5] = filler;
 		contents[i+2] = contents[i+3] = arrowDown;
 	}
+
+	/**
+	 * Callculate the score display
+	 * @return score display
+	 */
+	private List<ItemStack> scoreToDisplay(){
+		List<ItemStack> result = new ArrayList<ItemStack>(ROWS);
+		long score = gameState.getScore();
+		while(score > 0){
+			int digit = (int)(score % 10);
+			if(digit == 0){ result.add(new ItemStack(zeroMaterial)); }
+			else{ result.add(new ItemStack(scoreMaterial, digit)); }
+			score /= 10;
+		}
+		return result;
+	}
 	
 	/**
 	 * Create the inventory content, which shows the game board
 	 */
 	public void render(){
+		//4*4 board
 		for(int y = 0; y < IGameState.FIELD_SIZE; ++y){
 			int r = (COLS*(y+1)) + 1;
 			for(int x = 0; x < IGameState.FIELD_SIZE; ++x){
@@ -65,6 +87,13 @@ public class InventoryDisplay {
 					contents[x + r] = emptyField;
 				}
 			}
+		}
+		//score display
+		List<ItemStack> score = scoreToDisplay();
+		int row = (Math.min(score.size(), ROWS) * COLS) - 1;
+		for(ItemStack item : score){
+			contents[row] = item;
+			row -= COLS;
 		}
 		inventory.setContents(contents);
 	}
