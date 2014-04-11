@@ -52,4 +52,10 @@ public class FilePersistencer implements IPersistencer {
 	public boolean isAvailable(String itemName) {
 		return new File(path + itemName + ENDING).isFile();
 	}
+
+	@Override
+	public void delete(String itemName) throws IOException {
+		File item = new File(path + itemName + ENDING);
+		if(item.isFile()){ item.delete(); }
+	}
 }

@@ -1,14 +1,19 @@
 storage:
-  path: plugins/2048/
+  path: plugins/JP2048/
 
 cmd:
+  #Main Commands
   play: 2048
+  #Sub Commands to play
+  new: new
 
 lang:
   lang: deCh
   deCh:
     cant-play-on-console: 2048 kann momentan nicht auf der Serverkonsole gespielt werden
     game-title: 2048
+    game-over: Game Over. Verwende "/2048 new" um ein neues Spiel zu starten.
   enUs:
     cant-play-on-console: 2048 can't be played on the server console
     game-title: 2048
+    game-over: Game Over. Use "/2048 new" to start a new game.

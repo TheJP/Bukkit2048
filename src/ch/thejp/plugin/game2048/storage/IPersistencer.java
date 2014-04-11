@@ -32,4 +32,9 @@ public interface IPersistencer {
 	 * @throws IOException
 	 */
 	public boolean isAvailable(String itemName);
+	/**
+	 * Deletes the game state
+	 * @param itemName Identifier of the state
+	 */
+	public void delete(String itemName) throws IOException;
 }

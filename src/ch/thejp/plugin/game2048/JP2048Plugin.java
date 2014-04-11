@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
@@ -39,10 +40,11 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 	private IPersistencer persistencer;
 
 	//** Configs **//
-	private final String configFilename = "plugins/2048.yml";
+	private final String configFilename = "plugins/JP2048.yml";
 	private Configuration config = null;
 	private String langSection = "";
 	private String commandPlay = "";
+	private String commandNewGame = "";
 
 	/**
 	 * Gets the localized phrase
@@ -59,6 +61,15 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 		catch (IOException e) { getLogger().log(Level.WARNING, "Could not write game save file"); }
 	}
 
+	/**
+	 * Sends a message to the player, if the game is over
+	 */
+	private void checkGameOver(IGameState gameState, HumanEntity player){
+		if(gameState.isGameOver() && player instanceof Player){
+			((Player) player).sendMessage(ChatColor.RED + getPhrase("game-over"));
+		}
+	}
+
 	@Override
 	public void onEnable() {
 		getServer().getPluginManager().registerEvents(this, this);
@@ -70,8 +81,9 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 		config = YamlConfiguration.loadConfiguration(new File(configFilename));
 		langSection = "lang." + config.getString("lang.lang", "enUs") + ".";
 		commandPlay = config.getString("cmd.play", "2048");
+		commandNewGame = config.getString("cmd.new", "new");
 		//Create Persistencer
-		String storagePath = config.getString("storage.path", "plugins/2048/");
+		String storagePath = config.getString("storage.path", "plugins/JP2048/");
 		File storage = new File(storagePath);
 		storage.mkdirs(); //Create folder structure if it doesn' exist
 		persistencer = new FilePersistencer(storage.getAbsolutePath() + File.separatorChar);
@@ -87,6 +99,12 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 			} else {
 				//Yes: Show 2048 game board
 				Player player = (Player)sender;
+				if(args.length > 0 && args[0].equals(commandNewGame)){
+					//Start new game
+					games.remove(player.getName());
+					try { persistencer.delete(player.getName()); }
+					catch (IOException e) { getLogger().log(Level.WARNING, "Could not delete game save file"); return true; }
+				}
 				if(games.containsKey(player.getName())){
 					//Game exists already
 					PlayerGame game = games.get(player.getName());
@@ -103,16 +121,19 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 						try { persistencer.read(gameState, player.getName()); }
 						catch (IOException e) { getLogger().log(Level.WARNING, "Could not read game save file"); return true; }
 						gameLogic = new GameLogic(gameState, false);
+						checkGameOver(gameState, player);
 					}else{
+						//No: Start new game
 						gameLogic = new GameLogic(gameState);
 						save(gameState, player.getName());
 					}
+					//Create Display
 					Inventory inventory = getServer().createInventory(
 							player, InventoryDisplay.COLS*InventoryDisplay.ROWS, getPhrase("game-title"));
 					InventoryDisplay display = new InventoryDisplay(inventory, gameState);
 					display.render();
-					InventoryView inventoryView = player.openInventory(inventory);
-					games.put(player.getName(), new PlayerGame(inventoryView, gameLogic, display));
+					InventoryView inventoryView = player.openInventory(inventory); //Open Display
+					games.put(player.getName(), new PlayerGame(inventoryView, gameLogic, display)); //Save PlayerGame in RAM
 				}
 			}
 		}
@@ -131,6 +152,8 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 				game.getDisplay().render();
 				//Save game state
 				save(game.getGameLogic().getGameState(), player.getName());
+				//Game over?
+				checkGameOver(game.getGameLogic().getGameState(), player);
 			}
 		}
 	}
