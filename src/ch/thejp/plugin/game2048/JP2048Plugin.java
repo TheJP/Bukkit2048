@@ -40,6 +40,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 	private IPersistencer persistencer;
 	//Highscores
 	private HighscoreManager highscores;
+	private boolean readHighscoresSuccess = false;
 
 	//** Configs **//
 	private final String configFilename = "plugins/JP2048.yml";
@@ -62,8 +63,12 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 		highscores.set(itemName, gameState.getScore()); //Sets the highscore if better then the old one
 		try { persistencer.write(gameState, itemName); }
 		catch (IOException e) { getLogger().log(Level.WARNING, "Could not write game save file", e); }
-		try { persistencer.writeHighscores(highscores); }
-		catch (IOException e) { getLogger().log(Level.WARNING, "Could not write highscore save file", e); }
+		if(readHighscoresSuccess){ //Only write highscores if the highscores were read successfully (=> don't overwrite highscores)
+			try { persistencer.writeHighscores(highscores); }
+			catch (IOException e) { getLogger().log(Level.WARNING, "Could not write highscore save file", e); highscores = null; }
+		}else{
+			getLogger().log(Level.WARNING, "Did not save highscores, because could not load properly before");
+		}
 	}
 
 	/**
@@ -94,8 +99,8 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 		persistencer = new FilePersistencer(storage.getAbsolutePath() + File.separatorChar);
 		//Load highscores
 		highscores = new HighscoreManager();
-		try { persistencer.readHighscores(highscores); }
-		catch (IOException e) { getLogger().log(Level.WARNING, "Could not read highscore save file", e); }
+		try { persistencer.readHighscores(highscores); readHighscoresSuccess = true; }
+		catch (IOException e) { getLogger().log(Level.WARNING, "Could not read highscore save file", e); readHighscoresSuccess = false;  }
 	}
 	
 	@Override
