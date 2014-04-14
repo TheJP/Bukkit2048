@@ -38,6 +38,8 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 	//Map Playername->Game
 	private Map<String, PlayerGame> games = new HashMap<String, PlayerGame>();
 	private IPersistencer persistencer;
+	//Highscores
+	private HighscoreManager highscores;
 
 	//** Configs **//
 	private final String configFilename = "plugins/JP2048.yml";
@@ -57,8 +59,11 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 	 * Save given game state
 	 */
 	private void save(IGameState gameState, String itemName){
+		highscores.set(itemName, gameState.getScore()); //Sets the highscore if better then the old one
 		try { persistencer.write(gameState, itemName); }
-		catch (IOException e) { getLogger().log(Level.WARNING, "Could not write game save file"); }
+		catch (IOException e) { getLogger().log(Level.WARNING, "Could not write game save file", e); }
+		try { persistencer.writeHighscores(highscores); }
+		catch (IOException e) { getLogger().log(Level.WARNING, "Could not write highscore save file", e); }
 	}
 
 	/**
@@ -87,6 +92,10 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 		File storage = new File(storagePath);
 		storage.mkdirs(); //Create folder structure if it doesn' exist
 		persistencer = new FilePersistencer(storage.getAbsolutePath() + File.separatorChar);
+		//Load highscores
+		highscores = new HighscoreManager();
+		try { persistencer.readHighscores(highscores); }
+		catch (IOException e) { getLogger().log(Level.WARNING, "Could not read highscore save file", e); }
 	}
 	
 	@Override
@@ -103,7 +112,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 					//Start new game
 					games.remove(player.getName());
 					try { persistencer.delete(player.getName()); }
-					catch (IOException e) { getLogger().log(Level.WARNING, "Could not delete game save file"); return true; }
+					catch (IOException e) { getLogger().log(Level.WARNING, "Could not delete game save file", e); return true; }
 				}
 				if(games.containsKey(player.getName())){
 					//Game exists already
@@ -119,7 +128,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 					if(persistencer.isAvailable(player.getName())){
 						//Yes: Read save file
 						try { persistencer.read(gameState, player.getName()); }
-						catch (IOException e) { getLogger().log(Level.WARNING, "Could not read game save file"); return true; }
+						catch (IOException e) { getLogger().log(Level.WARNING, "Could not read game save file", e); return true; }
 						gameLogic = new GameLogic(gameState, false);
 						checkGameOver(gameState, player);
 					}else{
