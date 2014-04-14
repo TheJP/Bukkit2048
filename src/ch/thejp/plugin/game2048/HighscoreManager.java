@@ -45,7 +45,8 @@ public class HighscoreManager {
 	 */
 	public Entry<String, Long>[] getSorted(){
 		@SuppressWarnings("unchecked")
-		Entry<String, Long>[] result = (Entry<String, Long>[]) highscores.entrySet().toArray();
+		Entry<String, Long>[] result = new Entry[highscores.size()];
+		highscores.entrySet().toArray(result);
 		Arrays.sort(result, new Comparator<Entry<String, Long>>() {
 			@Override
 			public int compare(Entry<String, Long> o1, Entry<String, Long> o2) {
