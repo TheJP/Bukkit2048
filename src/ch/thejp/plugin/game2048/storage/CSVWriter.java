@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 /**
- * Class used to Write data in the csv format to a stream
+ * Class used to write data in the csv format to a stream
  * @author JP
  */
 public class CSVWriter {
