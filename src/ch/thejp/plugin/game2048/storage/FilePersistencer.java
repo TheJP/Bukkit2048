@@ -5,8 +5,11 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Map.Entry;
 
+import ch.thejp.plugin.game2048.HighscoreManager;
 import ch.thejp.plugin.game2048.logic.IGameState;
 
 /**
@@ -16,6 +19,10 @@ import ch.thejp.plugin.game2048.logic.IGameState;
 public class FilePersistencer implements IPersistencer {
 
 	private String path;
+	public static final String HIGHSCORE_FILE = "highscore.csv";
+	public static final String HIGHSCORE_COL_RANK = "Rang";
+	public static final String HIGHSCORE_COL_POINTS = "Punkte";
+	public static final String HIGHSCORE_COL_NAME = "Name";
 	public static final String ENDING = ".bin"; 
 
 	/**
@@ -57,5 +64,28 @@ public class FilePersistencer implements IPersistencer {
 	public void delete(String itemName) throws IOException {
 		File item = new File(path + itemName + ENDING);
 		if(item.isFile()){ item.delete(); }
+	}
+
+	@Override
+	public void readHighscores(HighscoreManager highscores) throws IOException {
+		
+	}
+
+	@Override
+	public void writeHighscores(HighscoreManager highscores) throws IOException {
+		CSVWriter writer = new CSVWriter(new FileWriter(path + HIGHSCORE_FILE, false));
+		try{
+			//Write heading
+			writer.writeLine(new Object[]{ HIGHSCORE_COL_RANK, HIGHSCORE_COL_POINTS, HIGHSCORE_COL_NAME });
+			Entry<String, Long>[] entries = highscores.getSorted();
+			int rank = 0, lastRank = 1; long lastScore = Long.MAX_VALUE;
+			for(Entry<String, Long> row : entries){
+				++rank;
+				if(row.getValue() < lastScore){ lastRank = rank; lastScore = row.getValue(); }
+				writer.writeLine(new Object[]{ lastRank, lastScore, row.getKey() });
+			}
+		}finally{
+			writer.close();
+		}
 	}
 }
