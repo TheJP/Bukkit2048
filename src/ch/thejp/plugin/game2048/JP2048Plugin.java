@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
@@ -48,6 +49,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 	private String langSection = "";
 	private String commandPlay = "";
 	private String commandNewGame = "";
+	private String commandStats = "";
 
 	/**
 	 * Gets the localized phrase
@@ -72,6 +74,20 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 	}
 
 	/**
+	 * Print sorted highscores to the player
+	 * @param receiver Receiver of the stats command
+	 */
+	private void printHighscores(CommandSender receiver){
+		receiver.sendMessage(ChatColor.GREEN + String.format("%4s %11s %s", "Rank", "Score", "Name"));
+		int rank = 0, lastRank = 1; long lastScore = Long.MAX_VALUE;
+		for(Entry<String, Long> entry : highscores.getSorted()){
+			++rank;
+			if(entry.getValue() < lastScore){ lastRank = rank; lastScore = entry.getValue(); }
+			receiver.sendMessage(String.format("%4d. %10d %s", lastRank, lastScore, entry.getKey()));
+		}
+	}
+
+	/**
 	 * Sends a message to the player, if the game is over
 	 */
 	private void checkGameOver(IGameState gameState, HumanEntity player){
@@ -84,6 +100,11 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 	public void onEnable() {
 		getServer().getPluginManager().registerEvents(this, this);
 	}
+
+	@Override
+	public void onDisable() {
+		// TODO Close open InventoryViews
+	}
 	
 	@Override
 	public void onLoad() {
@@ -92,6 +113,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 		langSection = "lang." + config.getString("lang.lang", "enUs") + ".";
 		commandPlay = config.getString("cmd.play", "2048");
 		commandNewGame = config.getString("cmd.new", "new");
+		commandStats = config.getString("cmd.stats", "stats");
 		//Create Persistencer
 		String storagePath = config.getString("storage.path", "plugins/JP2048/");
 		File storage = new File(storagePath);
@@ -100,15 +122,23 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 		//Load highscores
 		highscores = new HighscoreManager();
 		try { persistencer.readHighscores(highscores); readHighscoresSuccess = true; }
-		catch (IOException e) { getLogger().log(Level.WARNING, "Could not read highscore save file", e); readHighscoresSuccess = false;  }
+		catch (IOException e) {
+			getLogger().log(Level.WARNING, "Could not read highscore save file", e);
+			readHighscoresSuccess = false;
+			highscores = new HighscoreManager(); //Empty the highscores (if the data was partially read)
+		}
 	}
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		//Is the paly command entered and does the sender have permission?
 		if(command.getName().equals(commandPlay) && sender.hasPermission(permissionPlay)){
+			//print stats command
+			if(args.length > 0 && args[0].equals(commandStats)){
+				printHighscores(sender);
+			}
 			//Yes: Is the sender a player?
-			if(!(sender instanceof Player)){
+			else if(!(sender instanceof Player)){
 				sender.sendMessage(getPhrase("cant-play-on-console"));
 			} else {
 				//Yes: Show 2048 game board

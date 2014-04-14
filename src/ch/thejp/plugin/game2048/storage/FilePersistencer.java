@@ -1,10 +1,12 @@
 package ch.thejp.plugin.game2048.storage;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map.Entry;
@@ -68,7 +70,22 @@ public class FilePersistencer implements IPersistencer {
 
 	@Override
 	public void readHighscores(HighscoreManager highscores) throws IOException {
-		
+		CSVReader reader = new CSVReader(new BufferedReader(new FileReader(path + HIGHSCORE_FILE)));
+		try{
+			reader.readLine(); //Read Headings
+			String[] values;
+			do {
+				values = reader.readLine();
+				if(values != null){
+					try{
+						highscores.set(values[2], Long.valueOf(values[1]));
+					} catch(Throwable e) { throw new IOException(e); } //Pass exception up
+				}
+			} while(values != null);
+		}
+		finally{
+			reader.close();
+		}
 	}
 
 	@Override
@@ -77,9 +94,9 @@ public class FilePersistencer implements IPersistencer {
 		try{
 			//Write heading
 			writer.writeLine(new Object[]{ HIGHSCORE_COL_RANK, HIGHSCORE_COL_POINTS, HIGHSCORE_COL_NAME });
-			Entry<String, Long>[] entries = highscores.getSorted();
+			//Entry<String, Long>[] entries = highscores.getSorted();
 			int rank = 0, lastRank = 1; long lastScore = Long.MAX_VALUE;
-			for(Entry<String, Long> row : entries){
+			for(Entry<String, Long> row : highscores.getSorted()){
 				++rank;
 				if(row.getValue() < lastScore){ lastRank = rank; lastScore = row.getValue(); }
 				writer.writeLine(new Object[]{ lastRank, lastScore, row.getKey() });

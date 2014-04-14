@@ -6,6 +6,7 @@ cmd:
   play: 2048
   #Sub Commands to play
   new: new
+  stats: stats
 
 lang:
   lang: deCh
