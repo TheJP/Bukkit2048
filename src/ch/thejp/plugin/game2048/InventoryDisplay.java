@@ -25,6 +25,7 @@ public class InventoryDisplay {
 	private IGameState gameState;
 	private ItemStack[] contents;
 
+	//TODO: Add tooltip to the different arrows
 	private ItemStack arrowUp = new ItemStack(Material.FLINT);
 	private ItemStack arrowDown = new ItemStack(Material.HOPPER);
 	private ItemStack arrowLeft = new ItemStack(Material.CARROT_ITEM);
@@ -38,7 +39,7 @@ public class InventoryDisplay {
 	public InventoryDisplay(Inventory inventory, IGameState gameState) {
 		this.inventory = inventory;
 		this.gameState = gameState;
-		this.contents = new ItemStack[COLS*6];
+		this.contents = new ItemStack[COLS*ROWS];
 		initContents();
 	}
 	
