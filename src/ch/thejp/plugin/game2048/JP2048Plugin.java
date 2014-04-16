@@ -74,16 +74,24 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 	}
 
 	/**
-	 * Print sorted highscores to the player
+	 * Print sorted highscores to the player / console
 	 * @param receiver Receiver of the stats command
 	 */
 	private void printHighscores(CommandSender receiver){
-		receiver.sendMessage(ChatColor.GREEN + String.format("%4s %11s %s", "Rank", "Score", "Name"));
+		//TODO: Limit highscore rows (-> Don't spam client)
+		String format;
+		if(receiver instanceof Player){
+			receiver.sendMessage(ChatColor.GREEN + String.format("%s (%s, %s, %s)", getPhrase("hs"), getPhrase("hs-rank"), getPhrase("hs-score"), getPhrase("hs-name")));
+			format = "%d. %d %s";
+		}else{
+			receiver.sendMessage(ChatColor.GREEN + String.format("%4s %11s %s", getPhrase("hs-rank"), getPhrase("hs-score"), getPhrase("hs-name")));
+			format = "%4d. %10d %s";
+		}
 		int rank = 0, lastRank = 1; long lastScore = Long.MAX_VALUE;
 		for(Entry<String, Long> entry : highscores.getSorted()){
 			++rank;
 			if(entry.getValue() < lastScore){ lastRank = rank; lastScore = entry.getValue(); }
-			receiver.sendMessage(String.format("%4d. %10d %s", lastRank, lastScore, entry.getKey()));
+			receiver.sendMessage(String.format(format, lastRank, lastScore, entry.getKey()));
 		}
 	}
 
