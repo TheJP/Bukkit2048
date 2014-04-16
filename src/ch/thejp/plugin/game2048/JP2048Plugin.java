@@ -126,7 +126,9 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 		String storagePath = config.getString("storage.path", "plugins/JP2048/");
 		File storage = new File(storagePath);
 		storage.mkdirs(); //Create folder structure if it doesn' exist
-		persistencer = new FilePersistencer(storage.getAbsolutePath() + File.separatorChar);
+		persistencer = new FilePersistencer(storage.getAbsolutePath() + File.separatorChar,
+				config.getString("storage.highscore-file", "hs.csv"), //Highscore Filename
+				getPhrase("hs-rank"), getPhrase("hs-points"), getPhrase("hs-name")); //Highscore headings
 		//Load highscores
 		highscores = new HighscoreManager();
 		try { persistencer.readHighscores(highscores); readHighscoresSuccess = true; }

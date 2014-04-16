@@ -21,20 +21,26 @@ import ch.thejp.plugin.game2048.logic.IGameState;
 public class FilePersistencer implements IPersistencer {
 
 	private String path;
-	public static final String HIGHSCORE_FILE = "highscore.csv";
-	public static final String HIGHSCORE_COL_RANK = "Rang";
-	public static final String HIGHSCORE_COL_POINTS = "Punkte";
-	public static final String HIGHSCORE_COL_NAME = "Name";
+	public String highscoreFile;
+	public String highscoreColRank = "Rang";
+	public String highscoreColPoints = "Punkte";
+	public String highscoreColName = "Name";
 	public static final String ENDING = ".bin"; 
 
 	/**
 	 * Constructor with path
 	 * @param path Folder in which the items have to be stored
 	 */
-	public FilePersistencer(String path) {
+	public FilePersistencer(String path,
+			String highscoreFile, String highscoreColRank,
+			String highscoreColPoints, String highscoreColName) {
 		//Path has to end with the path separator
 		assert path.charAt(path.length()-1) == File.separatorChar : "Invalid path";
 		this.path = path;
+		this.highscoreFile = highscoreFile;
+		this.highscoreColRank = highscoreColRank;
+		this.highscoreColPoints = highscoreColPoints;
+		this.highscoreColName = highscoreColName;
 	}
 
 	@Override
@@ -70,7 +76,7 @@ public class FilePersistencer implements IPersistencer {
 
 	@Override
 	public void readHighscores(HighscoreManager highscores) throws IOException {
-		CSVReader reader = new CSVReader(new BufferedReader(new FileReader(path + HIGHSCORE_FILE)));
+		CSVReader reader = new CSVReader(new BufferedReader(new FileReader(path + highscoreFile)));
 		try{
 			reader.readLine(); //Read Headings
 			String[] values;
@@ -90,10 +96,10 @@ public class FilePersistencer implements IPersistencer {
 
 	@Override
 	public void writeHighscores(HighscoreManager highscores) throws IOException {
-		CSVWriter writer = new CSVWriter(new FileWriter(path + HIGHSCORE_FILE, false));
+		CSVWriter writer = new CSVWriter(new FileWriter(path + highscoreFile, false));
 		try{
 			//Write heading
-			writer.writeLine(new Object[]{ HIGHSCORE_COL_RANK, HIGHSCORE_COL_POINTS, HIGHSCORE_COL_NAME });
+			writer.writeLine(new Object[]{ highscoreColRank, highscoreColPoints, highscoreColName });
 			//Entry<String, Long>[] entries = highscores.getSorted();
 			int rank = 0, lastRank = 1; long lastScore = Long.MAX_VALUE;
 			for(Entry<String, Long> row : highscores.getSorted()){

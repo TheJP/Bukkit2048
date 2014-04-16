@@ -1,5 +1,6 @@
 storage:
   path: plugins/JP2048/
+  highscore-file: highscore.csv
 
 cmd:
   #Main Commands
