@@ -4,9 +4,11 @@ package ch.thejp.plugin.game2048;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Wool;
 
 import ch.thejp.plugin.game2048.logic.Direction;
 import ch.thejp.plugin.game2048.logic.IGameLogic;
@@ -32,7 +34,6 @@ public class InventoryDisplay {
 	private ItemStack arrowRight = new ItemStack(Material.ARROW);
 	private ItemStack filler = new ItemStack(Material.STICK);
 	private ItemStack emptyField = new ItemStack(Material.AIR);
-	private Material fieldMaterial = Material.COBBLESTONE;
 	private Material scoreMaterial = Material.STICK;
 	private Material zeroMaterial = Material.EGG;
 
@@ -73,7 +74,21 @@ public class InventoryDisplay {
 		}
 		return result;
 	}
-	
+
+	/**
+	 * Returns the ItemStack of the field
+	 * @param value Valid data: 0-63
+	 * @return
+	 */
+	private ItemStack getTileItems(byte value){
+		if(value > 63){ value = 63; }
+		else if(value < 0){ value = 0; }
+		ItemStack s = new ItemStack(Material.WOOL, value, (short) (value / 4));
+		//Does not work (will using this as soon as it works):
+		//s.setData(new Wool(DyeColor.values()[value / 4]));
+		return s;
+	}
+
 	/**
 	 * Create the inventory content, which shows the game board
 	 */
@@ -83,7 +98,7 @@ public class InventoryDisplay {
 			int r = (COLS*(y+1)) + 1;
 			for(int x = 0; x < IGameState.FIELD_SIZE; ++x){
 				if(gameState.getTile(x, y) > 0){
-					contents[x + r] = new ItemStack(fieldMaterial, gameState.getTile(x, y));
+					contents[x + r] = getTileItems(gameState.getTile(x, y));
 				}else{
 					contents[x + r] = emptyField;
 				}
