@@ -6,18 +6,23 @@ commands:
     description: Open game
     usage: /<command>
     permission: thejp.2048.play
-    permission-message: Berechtigung <permission> ist notwendig
+    permission-message: Permission <permission> is needed
   2048 new:
     description: Start new game
     usage: /<command>
     permission: thejp.2048.play
-    permission-message: Berechtigung <permission> ist notwendig
+    permission-message: Permission <permission> is needed
+  2048 stats:
+    description: Show stored highscores
+    usage: /<command>
+    permission: thejp.2048.play
+    permission-message: Permission <permission> is needed
 permissions:
   thejp.2048.*:
-    description: Schaltet alle Rechte fuer 2048-Befehle frei
+    description: Contains every 2048 permission
     default: op
     children:
       thejp.2048.play: true
   thejp.2048.play:
-    descripten: Erlaubt das Spielen von 2048
+    descripten: Permits to play 2048
     default: true
