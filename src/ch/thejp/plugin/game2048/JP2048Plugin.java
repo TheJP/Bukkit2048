@@ -111,7 +111,10 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 
 	@Override
 	public void onDisable() {
-		// TODO Close open InventoryViews
+		//Close open InventoryViews
+		for(Entry<String, PlayerGame> entry : games.entrySet()){
+			entry.getValue().getInventoryView().close();
+		}
 	}
 	
 	@Override
