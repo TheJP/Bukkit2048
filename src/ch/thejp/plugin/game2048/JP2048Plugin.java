@@ -111,7 +111,8 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 				announced < gameState.getScore()
 			){
 				//Yes: Announce
-				getServer().broadcastMessage(getPhrase("new-highscore").replace("<player>", player.getName()));
+				getServer().broadcastMessage(ChatColor.GREEN +
+						getPhrase("new-highscore").replace("<player>", player.getName()));
 				announced = gameState.getScore();
 			}
 		}
