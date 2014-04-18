@@ -71,6 +71,8 @@ public class CSVReader {
 				default: break;
 			}
 		}
+		//Add last value
+		if(value.length() > 0){ line.add(value.toString()); }
 		String[] array = new String[line.size()];
 		return line.toArray(line.toArray(array));
 	}

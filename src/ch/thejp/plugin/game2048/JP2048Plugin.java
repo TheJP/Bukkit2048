@@ -93,7 +93,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 			if(entry.getValue() < lastScore){ lastRank = rank; lastScore = entry.getValue(); }
 			receiver.sendMessage(String.format(format, lastRank, lastScore, entry.getKey()));
 			//Limit highscores
-			if(rank > config.getInt("misc.stats-max-count", 10)){ break; }
+			if(rank >= config.getInt("misc.stats-max-count", 10)){ break; }
 		}
 	}
 
@@ -146,7 +146,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 		storage.mkdirs(); //Create folder structure if it doesn' exist
 		persistencer = new FilePersistencer(storage.getAbsolutePath() + File.separatorChar,
 				config.getString("storage.highscore-file", "hs.csv"), //Highscore Filename
-				getPhrase("hs-rank"), getPhrase("hs-points"), getPhrase("hs-name")); //Highscore headings
+				getPhrase("hs-rank"), getPhrase("hs-score"), getPhrase("hs-name")); //Highscore headings
 		//Load highscores
 		highscores = new HighscoreManager();
 		try { persistencer.readHighscores(highscores); readHighscoresSuccess = true; }
