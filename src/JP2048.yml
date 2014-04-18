@@ -1,3 +1,6 @@
+misc:
+  stats-max-count: 10
+
 storage:
   path: plugins/JP2048/
   highscore-file: highscore.csv
