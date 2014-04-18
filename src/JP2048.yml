@@ -15,6 +15,7 @@ lang:
     cant-play-on-console: 2048 kann momentan nicht auf der Serverkonsole gespielt werden
     game-title: 2048
     game-over: Game Over. Verwende "/2048 new" um ein neues Spiel zu starten.
+    new-highscore: <player> hat einen neuen Highscore in 2048 erreicht. Highscores mit "/2048 stats" anzeigen.
     #hs = highscore
     hs: Rangliste
     hs-rank: Rang
@@ -24,6 +25,7 @@ lang:
     cant-play-on-console: 2048 can't be played on the server console
     game-title: 2048
     game-over: Game Over. Use "/2048 new" to start a new game.
+    new-highscore: <player> has reached a new highscore in 2048. See highscores using "/2048 stats".
     #hs = highscore
     hs: Highscore
     hs-rank: Rank

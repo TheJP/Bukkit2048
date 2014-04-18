@@ -42,6 +42,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 	//Highscores
 	private HighscoreManager highscores;
 	private boolean readHighscoresSuccess = false;
+	private long announced = 0; //Stores, which scores were announced as highscore (antispam)
 
 	//** Configs **//
 	private final String configFilename = "plugins/JP2048.yml";
@@ -101,6 +102,18 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 	private void checkGameOver(IGameState gameState, HumanEntity player){
 		if(gameState.isGameOver() && player instanceof Player){
 			((Player) player).sendMessage(ChatColor.RED + getPhrase("game-over"));
+			//Check for new highscore
+			Entry<String, Long>[] hs = highscores.getSorted();
+			//Is the current score a new highscore?
+			if(hs.length > 0 &&
+				hs[0].getKey().equals(player.getName()) &&
+				hs[0].getValue() == gameState.getScore() &&
+				announced < gameState.getScore()
+			){
+				//Yes: Announce
+				getServer().broadcastMessage(getPhrase("new-highscore").replace("<player>", player.getName()));
+				announced = gameState.getScore();
+			}
 		}
 	}
 
