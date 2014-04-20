@@ -13,7 +13,7 @@ cmd:
   stats: stats
 
 lang:
-  lang: deCh
+  lang: enUs
   deCh:
     cant-play-on-console: 2048 kann momentan nicht auf der Serverkonsole gespielt werden
     game-title: 2048
