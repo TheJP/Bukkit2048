@@ -1,10 +1,15 @@
 misc:
+  #Defines, how many entries are shown in the highscore print (/2048 stats)
   stats-max-count: 10
 
 storage:
+  #This path is used to store the game and highscore data
   path: plugins/JP2048/
+  #The filename of the highscore file
   highscore-file: highscore.csv
 
+#This section defines command names
+#(DONT CHANGE THEM, unless you know exactly what you do!)
 cmd:
   #Main Commands
   play: 2048
@@ -12,7 +17,10 @@ cmd:
   new: new
   stats: stats
 
+#In the following section defines the translations in different languages
+#Feel free to change the values or add new languages
 lang:
+  #Currently selected language
   lang: enUs
   deCh:
     cant-play-on-console: 2048 kann momentan nicht auf der Serverkonsole gespielt werden
