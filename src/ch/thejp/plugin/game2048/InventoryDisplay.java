@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import ch.thejp.plugin.game2048.logic.Direction;
+import ch.thejp.plugin.game2048.logic.GameMode;
 import ch.thejp.plugin.game2048.logic.IGameLogic;
 import ch.thejp.plugin.game2048.logic.IGameState;
 
@@ -26,6 +27,7 @@ public class InventoryDisplay {
 	private Inventory inventory;
 	private IGameState gameState;
 	private ItemStack[] contents;
+	private GameMode gameMode;
 	private IPhraser phraser;
 
 	//TODO: Add tooltip to the different arrows
@@ -38,10 +40,11 @@ public class InventoryDisplay {
 	private Material scoreMaterial = Material.STICK;
 	private Material zeroMaterial = Material.EGG;
 
-	public InventoryDisplay(Inventory inventory, IGameState gameState, IPhraser phraser) {
+	public InventoryDisplay(Inventory inventory, IGameState gameState, GameMode mode, IPhraser phraser) {
 		this.inventory = inventory;
 		this.gameState = gameState;
 		this.contents = new ItemStack[COLS*ROWS];
+		this.gameMode = mode;
 		this.phraser = phraser;
 		initContents();
 	}
@@ -93,19 +96,28 @@ public class InventoryDisplay {
 		return result;
 	}
 
+	private short calculateColor(long value){
+	    return (short) ((Math.log(value) / Math.log(2)) % 16);
+	}
+
 	/**
 	 * Returns the ItemStack of the field
 	 * @param value Valid data: 0-63
 	 * @return
 	 */
 	private ItemStack getTileItems(long value){
-		if(value > 63){ value = 63; }
-		else if(value < 0){ value = 0; }
-//		ItemStack s = new ItemStack(Material.WOOL, value, (short) (value / 4));
+		if(value < 0){ value = 0; }
+		ItemStack s;
+		if(gameMode == GameMode.GM64){
+			if(value > 63){ value = 63; }
+			s = new ItemStack(Material.WOOL, (byte) value, (short) (value / 4));
+		} else {
+			s = new ItemStack(Material.WOOL, 1, calculateColor(value));
+		}
 		//Does not work (will using this as soon as it works):
 		//s.setData(new Wool(DyeColor.values()[value / 4]));
-//		changeDisplayName(s, ChatColor.DARK_GREEN + Byte.toString(value));
-		return null;
+		changeDisplayName(s, ChatColor.DARK_GREEN + Long.toString(value));
+		return s;
 	}
 
 	/**

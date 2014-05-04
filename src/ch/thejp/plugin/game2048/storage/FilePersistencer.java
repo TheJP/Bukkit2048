@@ -25,7 +25,8 @@ public class FilePersistencer implements IPersistencer {
 	public String highscoreColRank = "Rang";
 	public String highscoreColPoints = "Punkte";
 	public String highscoreColName = "Name";
-	public static final String ENDING = ".bin"; 
+	//Changed in version 2.1.0 because saves are not backward compatible
+	public static final String ENDING = ".sav";
 
 	/**
 	 * Constructor with path
@@ -76,6 +77,8 @@ public class FilePersistencer implements IPersistencer {
 
 	@Override
 	public void readHighscores(HighscoreManager highscores) throws IOException {
+		File highscoreCheckFile = new File(path + highscoreFile);
+		if(!highscoreCheckFile.exists()){ return; }
 		CSVReader reader = new CSVReader(new BufferedReader(new FileReader(path + highscoreFile)));
 		try{
 			reader.readLine(); //Read Headings

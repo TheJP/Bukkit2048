@@ -199,13 +199,13 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IPhraser {
 						checkGameOver(gameState, player);
 					}else{
 						//No: Start new game
-						gameLogic = new GameLogic(gameState);
+						gameLogic = new GameLogic(gameState, true, gameMode);
 						save(gameState, player.getName());
 					}
 					//Create Display
 					Inventory inventory = getServer().createInventory(
 							player, InventoryDisplay.COLS*InventoryDisplay.ROWS, getPhrase("game-title"));
-					InventoryDisplay display = new InventoryDisplay(inventory, gameState, this);
+					InventoryDisplay display = new InventoryDisplay(inventory, gameState, gameMode, this);
 					display.render();
 					InventoryView inventoryView = player.openInventory(inventory); //Open Display
 					games.put(player.getName(), new PlayerGame(inventoryView, gameLogic, display)); //Save PlayerGame in RAM

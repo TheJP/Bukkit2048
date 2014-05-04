@@ -106,7 +106,9 @@ public class GameLogic implements IGameLogic {
 		if(freeSpaces.size() <= 0){ return; }
 		Random r = new Random();
 		Point choosen = freeSpaces.get(r.nextInt(freeSpaces.size()));
-		gameState.setTile(choosen.x, choosen.y, (byte) (r.nextInt(2)+1));
+		long value = r.nextInt(2)+1;
+		if(gameMode == GameMode.GM2048){ value *= 2; }
+		gameState.setTile(choosen.x, choosen.y, value);
 
 		//Performance improvement (game over doesn't has to be calculated this way):
 		if(freeSpaces.size() >= 2) {
@@ -137,10 +139,13 @@ public class GameLogic implements IGameLogic {
 				if(cond && gameState.getTile(x, y) > 0){
 					//** Combination situation **//
 					if(gameState.getTile(tileX, tileY) == gameState.getTile(x, y) && gameState.getTile(x, y) < 64) {
-						gameState.setTile(tileX, tileY, (byte)(gameState.getTile(tileX, tileY)+1)); //Combine tile
+						gameState.setTile(tileX, tileY, //Combine tile
+							gameMode == GameMode.GM64 ?
+							gameState.getTile(tileX, tileY)+1 :
+							gameState.getTile(tileX, tileY)*2);
 						tileX+=s.smallStepX; tileY+=s.smallStepY;
 						gameState.setScore(gameState.getScore() + gameState.getTile(x, y)); //Add to score
-						gameState.setTile(x, y, (byte) 0); //Reset old tile
+						gameState.setTile(x, y, 0); //Reset old tile
 						moved = true;
 					}
 					//** Move or stay situation **//
@@ -151,7 +156,7 @@ public class GameLogic implements IGameLogic {
 						//** Move situation **//
 						if(gameState.getTile(tileX, tileY) == 0){
 							gameState.setTile(tileX, tileY, gameState.getTile(x, y)); //Move
-							gameState.setTile(x, y, (byte) 0); //Reset old tile
+							gameState.setTile(x, y, 0); //Reset old tile
 							moved = true;
 						}
 					}
