@@ -34,7 +34,7 @@ import ch.thejp.plugin.game2048.storage.IPersistencer;
  * View-code of the 2048 Plugin 
  * @author JP
  */
-public class JP2048Plugin extends JavaPlugin implements Listener, IPhraser {
+public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration {
 
 	private Permission permissionPlay = new Permission("thejp.2048.play");
 	//Map Playername->Game
@@ -55,10 +55,14 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IPhraser {
 	private GameMode gameMode = GameMode.GM64;
 
 	/**
-	 * Gets the localized phrase
+	 * Gets a localized phrase
 	 */
 	public String getPhrase(String phrase){
 		return config.getString(langSection + phrase, phrase);
+	}
+
+	public Configuration getJPConfig(){
+		return config;
 	}
 
 	/**

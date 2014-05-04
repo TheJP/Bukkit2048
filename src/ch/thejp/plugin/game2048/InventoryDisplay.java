@@ -28,24 +28,23 @@ public class InventoryDisplay {
 	private IGameState gameState;
 	private ItemStack[] contents;
 	private GameMode gameMode;
-	private IPhraser phraser;
+	private IConfiguration config;
 
-	//TODO: Add tooltip to the different arrows
 	private ItemStack arrowUp = new ItemStack(Material.FLINT);
 	private ItemStack arrowDown = new ItemStack(Material.HOPPER);
 	private ItemStack arrowLeft = new ItemStack(Material.CARROT_ITEM);
 	private ItemStack arrowRight = new ItemStack(Material.ARROW);
-	private ItemStack filler = new ItemStack(Material.STICK);
+	private ItemStack filler;
 	private ItemStack emptyField = new ItemStack(Material.AIR);
 	private Material scoreMaterial = Material.STICK;
 	private Material zeroMaterial = Material.EGG;
 
-	public InventoryDisplay(Inventory inventory, IGameState gameState, GameMode mode, IPhraser phraser) {
+	public InventoryDisplay(Inventory inventory, IGameState gameState, GameMode mode, IConfiguration config) {
 		this.inventory = inventory;
 		this.gameState = gameState;
 		this.contents = new ItemStack[COLS*ROWS];
 		this.gameMode = mode;
-		this.phraser = phraser;
+		this.config = config;
 		initContents();
 	}
 	
@@ -53,11 +52,19 @@ public class InventoryDisplay {
 	 * Initialize frame of the display
 	 */
 	private void initContents(){
-		changeDisplayName(arrowUp, ChatColor.GREEN + phraser.getPhrase("display-up"));
-		changeDisplayName(arrowRight, ChatColor.GREEN + phraser.getPhrase("display-right"));
-		changeDisplayName(arrowDown, ChatColor.GREEN + phraser.getPhrase("display-down"));
-		changeDisplayName(arrowLeft, ChatColor.GREEN + phraser.getPhrase("display-left"));
+		//** Read filler Material from the config **//
+		Material fillerMaterial = Material.matchMaterial(config.getJPConfig().getString("misc.border-material", "STICK"));
+		System.out.println(fillerMaterial);
+		short fillerMeta = (short) config.getJPConfig().getInt("misc.border-metadata", 0);
+		if(fillerMaterial != null){ filler = new ItemStack(fillerMaterial, 1, (short) fillerMeta); }
+		else { filler = new ItemStack(Material.STICK); }
+		//** Add tooltips **//
+		changeDisplayName(arrowUp, ChatColor.GREEN + config.getPhrase("display-up"));
+		changeDisplayName(arrowRight, ChatColor.GREEN + config.getPhrase("display-right"));
+		changeDisplayName(arrowDown, ChatColor.GREEN + config.getPhrase("display-down"));
+		changeDisplayName(arrowLeft, ChatColor.GREEN + config.getPhrase("display-left"));
 		changeDisplayName(filler, " ");
+		//** Create playfield border **//
 		contents[0] = contents[1] = contents[4] = contents[5] = filler;
 		contents[2] = contents[3] = arrowUp;
 		int i = COLS;
@@ -137,7 +144,7 @@ public class InventoryDisplay {
 		}
 		//score display
 		List<ItemStack> score = scoreToDisplay();
-		String stringScore = String.format("%s%s: %d", ChatColor.GOLD, phraser.getPhrase("hs-score"), gameState.getScore());
+		String stringScore = String.format("%s%s: %d", ChatColor.GOLD, config.getPhrase("hs-score"), gameState.getScore());
 		int row = (Math.min(score.size(), ROWS) * COLS) - 1;
 		for(ItemStack item : score){
 			changeDisplayName(item, stringScore);
