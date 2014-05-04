@@ -98,14 +98,14 @@ public class InventoryDisplay {
 	 * @param value Valid data: 0-63
 	 * @return
 	 */
-	private ItemStack getTileItems(byte value){
+	private ItemStack getTileItems(long value){
 		if(value > 63){ value = 63; }
 		else if(value < 0){ value = 0; }
-		ItemStack s = new ItemStack(Material.WOOL, value, (short) (value / 4));
+//		ItemStack s = new ItemStack(Material.WOOL, value, (short) (value / 4));
 		//Does not work (will using this as soon as it works):
 		//s.setData(new Wool(DyeColor.values()[value / 4]));
-		changeDisplayName(s, ChatColor.DARK_GREEN + Byte.toString(value));
-		return s;
+//		changeDisplayName(s, ChatColor.DARK_GREEN + Byte.toString(value));
+		return null;
 	}
 
 	/**

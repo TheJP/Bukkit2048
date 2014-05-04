@@ -26,6 +26,7 @@ public class GameLogic implements IGameLogic {
 	}
 
 	private IGameState gameState;
+	private GameMode gameMode;
 	private Strategy[] strategies = {
 		new Strategy(0, 0, 0, 1), //UP
 		new Strategy(GameState.FIELD_SIZE - 1, 0, -1, 0), //RIGHT
@@ -38,16 +39,18 @@ public class GameLogic implements IGameLogic {
 	 * @param gameState
 	 */
 	public GameLogic(IGameState gameState) {
-		this(gameState, true);
+		this(gameState, true, GameMode.GM64);
 	}
 
 	/**
 	 * Constructor needs valid gamestate
 	 * @param gameState
+	 * @param gameMode
 	 * @param startNew true=Start new game on given game state (Add initial Tile)
 	 */
-	public GameLogic(IGameState gameState, boolean startNew) {
+	public GameLogic(IGameState gameState, boolean startNew, GameMode mode) {
 		this.gameState = gameState;
+		this.gameMode = mode;
 		//Add initial tile
 		if(startNew){ addRandomTile(); }
 	}
@@ -61,6 +64,11 @@ public class GameLogic implements IGameLogic {
 	public void setGameState(IGameState state) {
 		this.gameState = state;
 	}
+
+	@Override
+	public GameMode getGameMode() {
+		return gameMode;
+	};
 
 	/**
 	 * Gets an Strategy version of the Direction

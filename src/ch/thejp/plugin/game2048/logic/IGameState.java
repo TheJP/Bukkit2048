@@ -21,14 +21,14 @@ public interface IGameState {
 	 * @param y Y-Position
 	 * @return Tile value
 	 */
-	public byte getTile(int x, int y);
+	public long getTile(int x, int y);
 	/**
 	 * Sets the tile at the specified position
 	 * @param x X-Position
 	 * @param y Y-Position
 	 * @param tile Tile value
 	 */
-	public void setTile(int x, int y, byte tile);
+	public void setTile(int x, int y, long tile);
 	/**
 	 * Returns the current score
 	 * @return score of the current game

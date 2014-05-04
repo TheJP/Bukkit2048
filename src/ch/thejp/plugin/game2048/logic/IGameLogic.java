@@ -21,6 +21,11 @@ public interface IGameLogic {
 	 */
 	void setGameState(IGameState state);
 	/**
+	 * Returns the GameMode, which is played currently
+	 * @return
+	 */
+	GameMode getGameMode();
+	/**
 	 * Make a gamemove in the given direction
 	 * @param dir
 	 */

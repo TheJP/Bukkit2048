@@ -23,6 +23,7 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import ch.thejp.plugin.game2048.logic.GameLogic;
+import ch.thejp.plugin.game2048.logic.GameMode;
 import ch.thejp.plugin.game2048.logic.GameState;
 import ch.thejp.plugin.game2048.logic.IGameLogic;
 import ch.thejp.plugin.game2048.logic.IGameState;
@@ -51,6 +52,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IPhraser {
 	private String commandPlay = "";
 	private String commandNewGame = "";
 	private String commandStats = "";
+	private GameMode gameMode = GameMode.GM64;
 
 	/**
 	 * Gets the localized phrase
@@ -140,6 +142,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IPhraser {
 		commandPlay = config.getString("cmd.play", "2048");
 		commandNewGame = config.getString("cmd.new", "new");
 		commandStats = config.getString("cmd.stats", "stats");
+		gameMode = config.getString("misc.game-mode", "64").equals("64") ? GameMode.GM64 : GameMode.GM2048; 
 		//Create Persistencer
 		String storagePath = config.getString("storage.path", "plugins/JP2048/");
 		File storage = new File(storagePath);
@@ -192,7 +195,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IPhraser {
 						//Yes: Read save file
 						try { persistencer.read(gameState, player.getName()); }
 						catch (IOException e) { getLogger().log(Level.WARNING, "Could not read game save file", e); return true; }
-						gameLogic = new GameLogic(gameState, false);
+						gameLogic = new GameLogic(gameState, false, gameMode);
 						checkGameOver(gameState, player);
 					}else{
 						//No: Start new game

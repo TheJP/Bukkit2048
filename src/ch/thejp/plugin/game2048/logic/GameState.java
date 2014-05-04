@@ -6,18 +6,18 @@ import java.io.IOException;
 
 public class GameState implements IGameState {
 
-	private byte[][] field = new byte[FIELD_SIZE+2][FIELD_SIZE+2];
+	private long[][] field = new long[FIELD_SIZE+2][FIELD_SIZE+2];
 	private long score = 0;
 	private boolean gameOver = false;
 	private boolean gameOverValid = true;
 
 	@Override
-	public byte getTile(int x, int y) {
+	public long getTile(int x, int y) {
 		return field[x+1][y+1];
 	}
 
 	@Override
-	public void setTile(int x, int y, byte tile){
+	public void setTile(int x, int y, long tile){
 		field[x+1][y+1] = tile;
 		this.gameOverValid = false;
 	}
@@ -50,7 +50,7 @@ public class GameState implements IGameState {
 		//Write field
 		for(int x = 0; x < FIELD_SIZE; ++x){
 			for(int y = 0; y < FIELD_SIZE; ++y){
-				stream.writeByte(getTile(x, y));
+				stream.writeLong(getTile(x, y));
 			}
 		}
 	}
@@ -61,7 +61,7 @@ public class GameState implements IGameState {
 		//Read field
 		for(int x = 0; x < FIELD_SIZE; ++x){
 			for(int y = 0; y < FIELD_SIZE; ++y){
-				setTile(x, y, stream.readByte());
+				setTile(x, y, stream.readLong());
 			}
 		}
 	}
