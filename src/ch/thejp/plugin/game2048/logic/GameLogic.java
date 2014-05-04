@@ -138,7 +138,7 @@ public class GameLogic implements IGameLogic {
 				cond = isNotEnd(x, s.endX) && isNotEnd(y, s.endY);
 				if(cond && gameState.getTile(x, y) > 0){
 					//** Combination situation **//
-					if(gameState.getTile(tileX, tileY) == gameState.getTile(x, y) && gameState.getTile(x, y) < 64) {
+					if(gameState.getTile(tileX, tileY) == gameState.getTile(x, y) && (gameMode == GameMode.GM2048 || gameState.getTile(x, y) < 64)) {
 						gameState.setTile(tileX, tileY, //Combine tile
 							gameMode == GameMode.GM64 ?
 							gameState.getTile(tileX, tileY)+1 :
