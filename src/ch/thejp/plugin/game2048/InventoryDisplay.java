@@ -104,6 +104,7 @@ public class InventoryDisplay {
 		ItemStack s = new ItemStack(Material.WOOL, value, (short) (value / 4));
 		//Does not work (will using this as soon as it works):
 		//s.setData(new Wool(DyeColor.values()[value / 4]));
+		changeDisplayName(s, ChatColor.DARK_GREEN + Byte.toString(value));
 		return s;
 	}
 
@@ -124,8 +125,10 @@ public class InventoryDisplay {
 		}
 		//score display
 		List<ItemStack> score = scoreToDisplay();
+		String stringScore = String.format("%s%s: %d", ChatColor.GOLD, phraser.getPhrase("hs-score"), gameState.getScore());
 		int row = (Math.min(score.size(), ROWS) * COLS) - 1;
 		for(ItemStack item : score){
+			changeDisplayName(item, stringScore);
 			contents[row] = item;
 			row -= COLS;
 		}
