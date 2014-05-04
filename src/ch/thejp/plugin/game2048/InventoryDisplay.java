@@ -4,9 +4,11 @@ package ch.thejp.plugin.game2048;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import ch.thejp.plugin.game2048.logic.Direction;
 import ch.thejp.plugin.game2048.logic.IGameLogic;
@@ -24,6 +26,7 @@ public class InventoryDisplay {
 	private Inventory inventory;
 	private IGameState gameState;
 	private ItemStack[] contents;
+	private IPhraser phraser;
 
 	//TODO: Add tooltip to the different arrows
 	private ItemStack arrowUp = new ItemStack(Material.FLINT);
@@ -35,10 +38,11 @@ public class InventoryDisplay {
 	private Material scoreMaterial = Material.STICK;
 	private Material zeroMaterial = Material.EGG;
 
-	public InventoryDisplay(Inventory inventory, IGameState gameState) {
+	public InventoryDisplay(Inventory inventory, IGameState gameState, IPhraser phraser) {
 		this.inventory = inventory;
 		this.gameState = gameState;
 		this.contents = new ItemStack[COLS*ROWS];
+		this.phraser = phraser;
 		initContents();
 	}
 	
@@ -46,6 +50,11 @@ public class InventoryDisplay {
 	 * Initialize frame of the display
 	 */
 	private void initContents(){
+		changeDisplayName(arrowUp, ChatColor.GREEN + phraser.getPhrase("display-up"));
+		changeDisplayName(arrowRight, ChatColor.GREEN + phraser.getPhrase("display-right"));
+		changeDisplayName(arrowDown, ChatColor.GREEN + phraser.getPhrase("display-down"));
+		changeDisplayName(arrowLeft, ChatColor.GREEN + phraser.getPhrase("display-left"));
+		changeDisplayName(filler, " ");
 		contents[0] = contents[1] = contents[4] = contents[5] = filler;
 		contents[2] = contents[3] = arrowUp;
 		int i = COLS;
@@ -55,6 +64,17 @@ public class InventoryDisplay {
 		contents[i] = contents[i+5] = filler; i+=COLS;
 		contents[i] = contents[i+1] = contents[i+4] = contents[i+5] = filler;
 		contents[i+2] = contents[i+3] = arrowDown;
+	}
+
+	/**
+	 * Method to set the displayname of an ItemStack
+	 * @param s ItemStack
+	 * @param name New display name (ChatColor can be used)
+	 */
+	private void changeDisplayName(ItemStack s, String name){
+		ItemMeta m = s.getItemMeta();
+		m.setDisplayName(name);
+		s.setItemMeta(m);
 	}
 
 	/**

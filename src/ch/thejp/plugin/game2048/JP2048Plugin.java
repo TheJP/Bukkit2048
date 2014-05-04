@@ -33,7 +33,7 @@ import ch.thejp.plugin.game2048.storage.IPersistencer;
  * View-code of the 2048 Plugin 
  * @author JP
  */
-public class JP2048Plugin extends JavaPlugin implements Listener {
+public class JP2048Plugin extends JavaPlugin implements Listener, IPhraser {
 
 	private Permission permissionPlay = new Permission("thejp.2048.play");
 	//Map Playername->Game
@@ -55,7 +55,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 	/**
 	 * Gets the localized phrase
 	 */
-	private String getPhrase(String phrase){
+	public String getPhrase(String phrase){
 		return config.getString(langSection + phrase, phrase);
 	}
 
@@ -202,7 +202,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 					//Create Display
 					Inventory inventory = getServer().createInventory(
 							player, InventoryDisplay.COLS*InventoryDisplay.ROWS, getPhrase("game-title"));
-					InventoryDisplay display = new InventoryDisplay(inventory, gameState);
+					InventoryDisplay display = new InventoryDisplay(inventory, gameState, this);
 					display.render();
 					InventoryView inventoryView = player.openInventory(inventory); //Open Display
 					games.put(player.getName(), new PlayerGame(inventoryView, gameLogic, display)); //Save PlayerGame in RAM
