@@ -150,7 +150,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 		commandPlay = config.getString("cmd.play", "2048");
 		commandNewGame = config.getString("cmd.new", "new");
 		commandStats = config.getString("cmd.stats", "stats");
-		gameMode = config.getString("misc.game-mode", "64").equals("64") ? GameMode.GM64 : GameMode.GM2048; 
+		gameMode = config.getString("misc.game-mode", "2048").equals("64") ? GameMode.GM64 : GameMode.GM2048; 
 		//Create Persistencer
 		String storagePath = config.getString("storage.path", "plugins/JP2048/");
 		File storage = new File(storagePath);
