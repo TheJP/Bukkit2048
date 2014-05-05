@@ -2,6 +2,8 @@ package ch.thejp.plugin.game2048;
 
 import org.bukkit.configuration.Configuration;
 
+import ch.thejp.plugin.game2048.logic.GameMode;
+
 /**
  * Interface which allows access to the phrase method
  * @author JP
@@ -19,4 +21,9 @@ public interface IConfiguration {
 	 * @return
 	 */
 	Configuration getJPConfig();
+	/**
+	 * Returns the configured GameMode
+	 * @return
+	 */
+	GameMode getGameMode();
 }

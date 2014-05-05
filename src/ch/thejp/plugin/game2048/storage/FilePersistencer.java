@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.Map.Entry;
 
 import ch.thejp.plugin.game2048.HighscoreManager;
+import ch.thejp.plugin.game2048.IConfiguration;
+import ch.thejp.plugin.game2048.logic.GameMode;
 import ch.thejp.plugin.game2048.logic.IGameState;
 
 /**
@@ -21,32 +23,35 @@ import ch.thejp.plugin.game2048.logic.IGameState;
 public class FilePersistencer implements IPersistencer {
 
 	private String path;
-	public String highscoreFile;
-	public String highscoreColRank = "Rang";
-	public String highscoreColPoints = "Punkte";
-	public String highscoreColName = "Name";
+	private String highscoreFile;
+	private String highscoreColRank = "Rang";
+	private String highscoreColPoints = "Punkte";
+	private String highscoreColName = "Name";
 	//Changed in version 2.1.0 because saves are not backward compatible
-	public static final String ENDING = ".sav";
+	//Another change in version 2.1.3 so different gamemode save files do not ever mix up
+	private String ending;
 
 	/**
 	 * Constructor with path
 	 * @param path Folder in which the items have to be stored
 	 */
-	public FilePersistencer(String path,
-			String highscoreFile, String highscoreColRank,
-			String highscoreColPoints, String highscoreColName) {
+	public FilePersistencer(String path, IConfiguration config) {
 		//Path has to end with the path separator
 		assert path.charAt(path.length()-1) == File.separatorChar : "Invalid path";
 		this.path = path;
-		this.highscoreFile = highscoreFile;
-		this.highscoreColRank = highscoreColRank;
-		this.highscoreColPoints = highscoreColPoints;
-		this.highscoreColName = highscoreColName;
+		//Highscore Filename
+		this.highscoreFile = config.getJPConfig().getString("storage.highscore-file", "hs.csv");
+		//Highscore headings
+		this.highscoreColRank = config.getPhrase("hs-rank");
+		this.highscoreColPoints = config.getPhrase("hs-score");
+		this.highscoreColName = config.getPhrase("hs-name");
+		//Different endings for 64 and 2048 gamemode
+		ending = config.getGameMode() == GameMode.GM64 ? ".s64" : ".sav";
 	}
 
 	@Override
 	public void write(IGameState gameState, String itemName) throws IOException {
-		DataOutputStream writer = new DataOutputStream(new FileOutputStream(path + itemName + ENDING, false));
+		DataOutputStream writer = new DataOutputStream(new FileOutputStream(path + itemName + ending, false));
 		try{
 			gameState.write(writer);
 		}finally{
@@ -56,7 +61,7 @@ public class FilePersistencer implements IPersistencer {
 
 	@Override
 	public void read(IGameState gameState, String itemName) throws IOException {
-		DataInputStream reader = new DataInputStream(new FileInputStream(path + itemName + ENDING));
+		DataInputStream reader = new DataInputStream(new FileInputStream(path + itemName + ending));
 		try{
 			gameState.read(reader);
 		}finally{
@@ -66,12 +71,12 @@ public class FilePersistencer implements IPersistencer {
 
 	@Override
 	public boolean isAvailable(String itemName) {
-		return new File(path + itemName + ENDING).isFile();
+		return new File(path + itemName + ending).isFile();
 	}
 
 	@Override
 	public void delete(String itemName) throws IOException {
-		File item = new File(path + itemName + ENDING);
+		File item = new File(path + itemName + ending);
 		if(item.isFile()){ item.delete(); }
 	}
 

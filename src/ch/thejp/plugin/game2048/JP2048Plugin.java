@@ -54,15 +54,19 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 	private String commandStats = "";
 	private GameMode gameMode = GameMode.GM64;
 
-	/**
-	 * Gets a localized phrase
-	 */
+	@Override
 	public String getPhrase(String phrase){
 		return config.getString(langSection + phrase, phrase);
 	}
 
+	@Override
 	public Configuration getJPConfig(){
 		return config;
+	}
+
+	@Override
+	public GameMode getGameMode() {
+		return gameMode;
 	}
 
 	/**
@@ -151,9 +155,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 		String storagePath = config.getString("storage.path", "plugins/JP2048/");
 		File storage = new File(storagePath);
 		storage.mkdirs(); //Create folder structure if it doesn' exist
-		persistencer = new FilePersistencer(storage.getAbsolutePath() + File.separatorChar,
-				config.getString("storage.highscore-file", "hs.csv"), //Highscore Filename
-				getPhrase("hs-rank"), getPhrase("hs-score"), getPhrase("hs-name")); //Highscore headings
+		persistencer = new FilePersistencer(storage.getAbsolutePath() + File.separatorChar, this);
 		//Load highscores
 		highscores = new HighscoreManager();
 		try { persistencer.readHighscores(highscores); readHighscoresSuccess = true; }
