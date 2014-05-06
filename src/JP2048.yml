@@ -65,6 +65,11 @@ display:
   #Custom border material
   border-material: stained_glass
   border-metadata: 15
+  #Custom score materials
+  score-material: #default=stick
+  score-metadata:
+  zero-material: #default=egg
+  zero-metadata:
   #Custom arrow materials
   arrow:
     up-material:
