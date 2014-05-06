@@ -3,9 +3,6 @@ misc:
   stats-max-count: 10
   #Defines the game-mode, which is used to play (2048=>Original Game, 64=>Adapted) 
   game-mode: 2048
-  #Allows to set a custom border
-  border-material: stained_glass
-  border-metadata: 15
 
 storage:
   #This path is used to store the game and highscore data
@@ -61,3 +58,46 @@ lang:
     display-right: Right
     display-down: Down
     display-left: Left
+
+#This section allows to change displayed inventory items
+#If materials are not specified here, custom will be used
+display:
+  #Custom border material
+  border-material: stained_glass
+  border-metadata: 15
+  #Custom arrow materials
+  arrow:
+    up-material:
+    up-metadata:
+    right-material:
+    right-metadata:
+    down-material:
+    down-metadata:
+    left-material:
+    left-metadata:
+  #Custom tile materials
+  tile:
+    2-material:
+    2-metadata:
+    4-material:
+    4-metadata:
+    8-material:
+    8-metadata:
+    16-material:
+    16-metadata:
+    32-material:
+    32-metadata:
+    64-material:
+    64-metadata:
+    128-material:
+    128-metadata:
+    256-material:
+    256-metadata:
+    512-material:
+    512-metadata:
+    1024-material:
+    1024-metadata:
+    2048-material:
+    2048-metadata:
+    4096-material:
+    4096-metadata:
