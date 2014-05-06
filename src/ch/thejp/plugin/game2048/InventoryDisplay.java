@@ -30,11 +30,12 @@ public class InventoryDisplay {
 	private GameMode gameMode;
 	private IConfiguration config;
 
+	//Materials with default values
 	private ItemStack arrowUp = new ItemStack(Material.FLINT);
+	private ItemStack arrowRight = new ItemStack(Material.ARROW);
 	private ItemStack arrowDown = new ItemStack(Material.HOPPER);
 	private ItemStack arrowLeft = new ItemStack(Material.CARROT_ITEM);
-	private ItemStack arrowRight = new ItemStack(Material.ARROW);
-	private ItemStack filler;
+	private ItemStack filler = new ItemStack(Material.STAINED_GLASS, 1, (short) 15);
 	private ItemStack emptyField = new ItemStack(Material.AIR);
 	private Material scoreMaterial = Material.STICK;
 	private Material zeroMaterial = Material.EGG;
@@ -52,12 +53,16 @@ public class InventoryDisplay {
 	 * Initialize frame of the display
 	 */
 	private void initContents(){
-		//** Read filler Material from the config **//
-		Material fillerMaterial = Material.matchMaterial(config.getJPConfig().getString("misc.border-material", "STICK"));
-		System.out.println(fillerMaterial);
-		short fillerMeta = (short) config.getJPConfig().getInt("misc.border-metadata", 0);
-		if(fillerMaterial != null){ filler = new ItemStack(fillerMaterial, 1, (short) fillerMeta); }
-		else { filler = new ItemStack(Material.STICK); }
+		//** Read Materials from config **//
+//		Material fillerMaterial = Material.matchMaterial(config.getJPConfig().getString("misc.border-material", "STICK"));
+//		short fillerMeta = (short) config.getJPConfig().getInt("misc.border-metadata", 0);
+//		if(fillerMaterial != null){ filler = new ItemStack(fillerMaterial, 1, (short) fillerMeta); }
+//		else { filler = new ItemStack(Material.STICK); }
+		filler = getConfigMaterial("display.border", filler, 1);
+		arrowUp = getConfigMaterial("display.arrow.up", arrowUp, 1);
+		arrowRight = getConfigMaterial("display.arrow.right", arrowRight, 1);
+		arrowDown = getConfigMaterial("display.arrow.down", arrowDown, 1);
+		arrowLeft = getConfigMaterial("display.arrow.left", arrowLeft, 1);
 		//** Add tooltips **//
 		changeDisplayName(arrowUp, ChatColor.GREEN + config.getPhrase("display-up"));
 		changeDisplayName(arrowRight, ChatColor.GREEN + config.getPhrase("display-right"));
@@ -74,6 +79,25 @@ public class InventoryDisplay {
 		contents[i] = contents[i+5] = filler; i+=COLS;
 		contents[i] = contents[i+1] = contents[i+4] = contents[i+5] = filler;
 		contents[i+2] = contents[i+3] = arrowDown;
+	}
+
+	/**
+	 * Reads a Material as ItemStack from the configuration
+	 * @param configKey
+	 * @param def Default value
+	 * @param amount Amount of items in the ItemStack
+	 * @return
+	 */
+	private ItemStack getConfigMaterial(String configKey, ItemStack def, int amount){
+		//Read material name
+		String materialName = config.getJPConfig().getString(configKey + "-material", null);
+		if(materialName == null){ return def; }
+		//Match material
+		Material match = Material.matchMaterial(materialName);
+		if(match == null){ return def; }
+		//Set metadata
+		short metadata = (short) config.getJPConfig().getInt(configKey + "-metadata", 0);
+		return new ItemStack(match, amount, metadata);
 	}
 
 	/**
@@ -96,20 +120,28 @@ public class InventoryDisplay {
 		long score = gameState.getScore();
 		while(score > 0){
 			int digit = (int)(score % 10);
-			if(digit == 0){ result.add(new ItemStack(zeroMaterial)); }
-			else{ result.add(new ItemStack(scoreMaterial, digit)); }
+			if(digit == 0){
+				result.add(getConfigMaterial("display.zero", new ItemStack(zeroMaterial), 1));
+			} else {
+				result.add(getConfigMaterial("display.score", new ItemStack(scoreMaterial, digit), digit));
+			}
 			score /= 10;
 		}
 		return result;
 	}
 
+	/**
+	 * Get default color of tiel in gamemode 2048
+	 * @param value
+	 * @return
+	 */
 	private short calculateColor(long value){
 	    return (short) ((Math.log(value) / Math.log(2)) % 16);
 	}
 
 	/**
 	 * Returns the ItemStack of the field
-	 * @param value Valid data: 0-63
+	 * @param value
 	 * @return
 	 */
 	private ItemStack getTileItems(long value){
@@ -117,10 +149,14 @@ public class InventoryDisplay {
 		ItemStack s;
 		if(gameMode == GameMode.GM64){
 			if(value > 63){ value = 63; }
+			//Default value
 			s = new ItemStack(Material.WOOL, (byte) value, (short) (value / 4));
 		} else {
+			//Default value
 			s = new ItemStack(Material.WOOL, 1, calculateColor(value));
 		}
+		//Get Material from config (or set default)
+		s = getConfigMaterial("display.tile." + value, s, s.getAmount());
 		//Does not work (will using this as soon as it works):
 		//s.setData(new Wool(DyeColor.values()[value / 4]));
 		changeDisplayName(s, ChatColor.DARK_GREEN + Long.toString(value));
