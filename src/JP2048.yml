@@ -60,7 +60,7 @@ lang:
     display-left: Left
 
 #This section allows to change displayed inventory items
-#If materials are not specified here, custom will be used
+#If no custom materials are specified here, defaults will be used
 display:
   #Custom border material
   border-material: stained_glass
