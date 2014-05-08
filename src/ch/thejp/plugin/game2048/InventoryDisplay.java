@@ -159,7 +159,8 @@ public class InventoryDisplay {
 		s = getConfigMaterial("display.tile." + value, s, s.getAmount());
 		//Does not work (will using this as soon as it works):
 		//s.setData(new Wool(DyeColor.values()[value / 4]));
-		changeDisplayName(s, ChatColor.DARK_GREEN + Long.toString(value));
+		changeDisplayName(s, ChatColor.DARK_GREEN +
+				config.getJPConfig().getString("display.tile-color", "") + Long.toString(value));
 		return s;
 	}
 

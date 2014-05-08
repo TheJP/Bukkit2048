@@ -100,6 +100,8 @@ display:
     down-metadata:
     left-material:
     left-metadata:
+  #Custom tile tooltip (mouse over) color
+  tile-color:
   #Custom tile materials
   tile:
     2-material:
