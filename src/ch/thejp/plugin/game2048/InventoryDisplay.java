@@ -180,7 +180,7 @@ public class InventoryDisplay {
 		}
 		//score display
 		List<ItemStack> score = scoreToDisplay();
-		String stringScore = String.format("%s%s: %d", ChatColor.GOLD, config.getPhrase("hs-score"), gameState.getScore());
+		String stringScore = String.format("%s%s: %d", ChatColor.GOLD, config.getPhrase("display-score"), gameState.getScore());
 		int row = (Math.min(score.size(), ROWS) * COLS) - 1;
 		for(ItemStack item : score){
 			changeDisplayName(item, stringScore);
