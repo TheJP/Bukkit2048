@@ -79,6 +79,13 @@ lang:
     display-left: Balra
     display-score: Eredmény
 
+#This section allows to define callback commands for different events
+callback:
+  cmd:
+    play:
+    new:
+    stats:
+
 #This section allows to change displayed inventory items
 #If no custom materials are specified here, defaults will be used
 display:
