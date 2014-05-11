@@ -52,6 +52,9 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 	private String commandPlay = "";
 	private String commandNewGame = "";
 	private String commandStats = "";
+	private String callbackPlay = null;
+	private String callbackNewGame = null;
+	private String callbackStats = null;
 	private GameMode gameMode = GameMode.GM64;
 
 	@Override
@@ -150,6 +153,9 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 		commandPlay = config.getString("cmd.play", "2048");
 		commandNewGame = config.getString("cmd.new", "new");
 		commandStats = config.getString("cmd.stats", "stats");
+		callbackPlay = config.getString("callback.cmd.play", null);
+		callbackNewGame = config.getString("callback.cmd.new", null);
+		callbackStats = config.getString("callback.cmd.stats", null);
 		gameMode = config.getString("misc.game-mode", "2048").equals("64") ? GameMode.GM64 : GameMode.GM2048; 
 		//Create Persistencer
 		String storagePath = config.getString("storage.path", "plugins/JP2048/");
@@ -170,9 +176,13 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		//Is the paly command entered and does the sender have permission?
 		if(command.getName().equals(commandPlay) && sender.hasPermission(permissionPlay)){
-			//print stats command
+			//** print stats command **//
 			if(args.length > 0 && args[0].equals(commandStats)){
 				printHighscores(sender);
+				//Execute callback
+				if(callbackStats != null){
+					getServer().dispatchCommand(getServer().getConsoleSender(), callbackStats);
+				}
 			}
 			//Yes: Is the sender a player?
 			else if(!(sender instanceof Player)){
@@ -181,10 +191,20 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 				//Yes: Show 2048 game board
 				Player player = (Player)sender;
 				if(args.length > 0 && args[0].equals(commandNewGame)){
-					//Start new game
+					//** Start new game **//
 					games.remove(player.getName());
 					try { persistencer.delete(player.getName()); }
 					catch (IOException e) { getLogger().log(Level.WARNING, "Could not delete game save file", e); return true; }
+					//Execute callback
+					if(callbackNewGame != null){
+						getServer().dispatchCommand(getServer().getConsoleSender(), callbackNewGame);
+					}
+				} else {
+					//** Play existing game **//
+					//Execute callback
+					if(callbackPlay != null){
+						getServer().dispatchCommand(getServer().getConsoleSender(), callbackPlay);
+					}
 				}
 				if(games.containsKey(player.getName())){
 					//Game exists already
