@@ -52,7 +52,7 @@ public class GameLogic implements IGameLogic {
 		this.gameState = gameState;
 		this.gameMode = mode;
 		//Add initial tile
-		if(startNew){ addRandomTile(); }
+		if(startNew){ addRandomTile(); addRandomTile(); }
 	}
 
 	@Override
