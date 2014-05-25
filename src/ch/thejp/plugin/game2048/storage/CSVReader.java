@@ -42,6 +42,7 @@ public class CSVReader {
 			switch (state) {
 				case BeforeValue:
 					if(c == '"'){ state = State.InEscapedValue; } //Escaped
+					else if(c == ';'){ line.add(""); } //Empty value
 					else { value.append(c); state = State.InUnescapedValue; } //Unescaped
 					break;
 				case InUnescapedValue:
