@@ -130,7 +130,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 	private boolean checkPermission(CommandSender sender, Permission permission){
 		if(!enabledPermissions || sender.hasPermission(permission)){ return true; }
 		else{
-			sender.sendMessage(ChatColor.RED + getPhrase("permission-message"));
+			sender.sendMessage(ChatColor.RED + getPhrase("permission-message").replace("<permission>", permission.getName()));
 			return false;
 		}
 	}
@@ -233,8 +233,8 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		//Is the paly command entered and does the sender have permission?
-		if(command.getName().equals(commandPlay) && sender.hasPermission(permissionPlay)){
+		//Is the paly command entered?
+		if(command.getName().equals(commandPlay)){
 			//** print stats command **//
 			if(args.length > 0 && args[0].equals(commandStats)){
 				//Check for the stats permission
