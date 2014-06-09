@@ -36,7 +36,6 @@ import ch.thejp.plugin.game2048.storage.IPersistencer;
  */
 public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration {
 
-	private Permission permissionPlay = new Permission("thejp.2048.play");
 	//Map Playername->Game
 	private Map<String, PlayerGame> games = new HashMap<String, PlayerGame>();
 	private IPersistencer persistencer;
@@ -46,6 +45,9 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 	private long announced = 0; //Stores, which scores were announced as highscore (antispam)
 
 	//** Configs **//
+	private Permission permissionPlay;
+	private Permission permissionNew;
+	private Permission permissionStats;
 	private final String configFilename = "plugins/JP2048.yml";
 	private Configuration config = null;
 	private String langSection = "";
@@ -56,21 +58,6 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 	private String callbackNewGame = null;
 	private String callbackStats = null;
 	private GameMode gameMode = GameMode.GM64;
-
-	@Override
-	public String getPhrase(String phrase){
-		return config.getString(langSection + phrase, phrase);
-	}
-
-	@Override
-	public Configuration getJPConfig(){
-		return config;
-	}
-
-	@Override
-	public GameMode getGameMode() {
-		return gameMode;
-	}
 
 	/**
 	 * Save given game state
@@ -132,6 +119,73 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 		}
 	}
 
+	/**
+	 * Checks if the given sender has the given permission.
+	 * If not the sender will receive the configured chat message
+	 * @param sender Sender for which the permission will be checked
+	 * @param permission Permission, which will be checked
+	 * @return True if the sender has the permission, false otherwise
+	 */
+	private boolean checkPermission(CommandSender sender, Permission permission){
+		if(sender.hasPermission(permission)){ return true; }
+		else{
+			sender.sendMessage(ChatColor.RED + getPhrase("permission-message"));
+			return false;
+		}
+	}
+
+	/**
+	 * Starts / continues the game (by opening the game inventory) 
+	 * @param player
+	 */
+	private void play(Player player){
+		if(games.containsKey(player.getName())){
+			//Game exists already
+			PlayerGame game = games.get(player.getName());
+			game.getInventoryView().close(); //Make sure only one inventory is open
+			//Reopen existing inventory
+			game.getDisplay().render();
+			game.setInventoryView(player.openInventory(game.getDisplay().getInventory()));
+		}else{
+			IGameState gameState = new GameState();
+			IGameLogic gameLogic;
+			//Is a save file available?
+			if(persistencer.isAvailable(player.getName())){
+				//Yes: Read save file
+				try { persistencer.read(gameState, player.getName()); }
+				catch (IOException e) { getLogger().log(Level.WARNING, "Could not read game save file", e); return; }
+				gameLogic = new GameLogic(gameState, false, gameMode);
+				checkGameOver(gameState, player);
+			}else{
+				//No: Start new game
+				gameLogic = new GameLogic(gameState, true, gameMode);
+				save(gameState, player.getName());
+			}
+			//Create Display
+			Inventory inventory = getServer().createInventory(
+					player, InventoryDisplay.COLS*InventoryDisplay.ROWS, getPhrase("game-title"));
+			InventoryDisplay display = new InventoryDisplay(inventory, gameState, gameMode, this);
+			display.render();
+			InventoryView inventoryView = player.openInventory(inventory); //Open Display
+			games.put(player.getName(), new PlayerGame(inventoryView, gameLogic, display)); //Save PlayerGame in RAM
+		}
+	}
+
+	@Override
+	public String getPhrase(String phrase){
+		return config.getString(langSection + phrase, phrase);
+	}
+
+	@Override
+	public Configuration getJPConfig(){
+		return config;
+	}
+
+	@Override
+	public GameMode getGameMode() {
+		return gameMode;
+	}
+
 	@Override
 	public void onEnable() {
 		getServer().getPluginManager().registerEvents(this, this);
@@ -156,7 +210,10 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 		callbackPlay = config.getString("callback.cmd.play", null);
 		callbackNewGame = config.getString("callback.cmd.new", null);
 		callbackStats = config.getString("callback.cmd.stats", null);
-		gameMode = config.getString("misc.game-mode", "2048").equals("64") ? GameMode.GM64 : GameMode.GM2048; 
+		gameMode = config.getString("misc.game-mode", "2048").equals("64") ? GameMode.GM64 : GameMode.GM2048;
+		permissionPlay = new Permission(config.getString("perm.play", "thejp.2048.play"));
+		permissionNew = new Permission(config.getString("perm.new", "thejp.2048.new"));
+		permissionStats = new Permission(config.getString("perm.stats", "thejp.2048.stats"));
 		//Create Persistencer
 		String storagePath = config.getString("storage.path", "plugins/JP2048/");
 		File storage = new File(storagePath);
@@ -178,10 +235,13 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 		if(command.getName().equals(commandPlay) && sender.hasPermission(permissionPlay)){
 			//** print stats command **//
 			if(args.length > 0 && args[0].equals(commandStats)){
-				printHighscores(sender);
-				//Execute callback
-				if(callbackStats != null){
-					getServer().dispatchCommand(getServer().getConsoleSender(), callbackStats);
+				//Check for the stats permission
+				if(checkPermission(sender, permissionStats)){
+					printHighscores(sender);
+					//Execute callback
+					if(callbackStats != null){
+						getServer().dispatchCommand(getServer().getConsoleSender(), callbackStats);
+					}
 				}
 			}
 			//Yes: Is the sender a player?
@@ -191,6 +251,8 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 				//Yes: Show 2048 game board
 				Player player = (Player)sender;
 				if(args.length > 0 && args[0].equals(commandNewGame)){
+					//Check for "new" permission
+					if(!checkPermission(sender, permissionNew)) { return true; }
 					//** Start new game **//
 					games.remove(player.getName());
 					try { persistencer.delete(player.getName()); }
@@ -200,42 +262,15 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 						getServer().dispatchCommand(getServer().getConsoleSender(), callbackNewGame);
 					}
 				} else {
+					//Check for "play" permission
+					if(!checkPermission(sender, permissionPlay)) { return true; }
 					//** Play existing game **//
 					//Execute callback
 					if(callbackPlay != null){
 						getServer().dispatchCommand(getServer().getConsoleSender(), callbackPlay);
 					}
 				}
-				if(games.containsKey(player.getName())){
-					//Game exists already
-					PlayerGame game = games.get(player.getName());
-					game.getInventoryView().close(); //Make sure only one inventory is open
-					//Reopen existing inventory
-					game.getDisplay().render();
-					game.setInventoryView(player.openInventory(game.getDisplay().getInventory()));
-				}else{
-					IGameState gameState = new GameState();
-					IGameLogic gameLogic;
-					//Is a save file available?
-					if(persistencer.isAvailable(player.getName())){
-						//Yes: Read save file
-						try { persistencer.read(gameState, player.getName()); }
-						catch (IOException e) { getLogger().log(Level.WARNING, "Could not read game save file", e); return true; }
-						gameLogic = new GameLogic(gameState, false, gameMode);
-						checkGameOver(gameState, player);
-					}else{
-						//No: Start new game
-						gameLogic = new GameLogic(gameState, true, gameMode);
-						save(gameState, player.getName());
-					}
-					//Create Display
-					Inventory inventory = getServer().createInventory(
-							player, InventoryDisplay.COLS*InventoryDisplay.ROWS, getPhrase("game-title"));
-					InventoryDisplay display = new InventoryDisplay(inventory, gameState, gameMode, this);
-					display.render();
-					InventoryView inventoryView = player.openInventory(inventory); //Open Display
-					games.put(player.getName(), new PlayerGame(inventoryView, gameLogic, display)); //Save PlayerGame in RAM
-				}
+				play(player);
 			}
 		}
 		return true;

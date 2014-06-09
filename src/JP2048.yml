@@ -1,4 +1,6 @@
 misc:
+  #Defines, if permissions should be used (true=>permissions are used, false=>permissions are not used)
+  perm: false
   #Defines, how many entries are shown in the highscore print (/2048 stats)
   stats-max-count: 10
   #Defines the game-mode, which is used to play (2048=>Original Game, 64=>Adapted) 
