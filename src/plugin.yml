@@ -1,21 +1,21 @@
 name: JP2048
 main: ch.thejp.plugin.game2048.JP2048Plugin
-version: 2.1.2
+version: 2.3.0
 commands:
   2048:
     description: Open game
     usage: /<command>
-    permission: thejp.2048.play
+    permission: thejp.2048.true
     permission-message: Permission <permission> is needed
   2048 new:
     description: Start new game
     usage: /<command>
-    permission: thejp.2048.play
+    permission: thejp.2048.true
     permission-message: Permission <permission> is needed
   2048 stats:
     description: Show stored highscores
     usage: /<command>
-    permission: thejp.2048.play
+    permission: thejp.2048.true
     permission-message: Permission <permission> is needed
 permissions:
   thejp.2048.*:
@@ -23,6 +23,21 @@ permissions:
     default: op
     children:
       thejp.2048.play: true
+      thejp.2048.new: true
+      thejp.2048.stats: true
+      thejp.2048.undo.unlimited: true
   thejp.2048.play:
     descripten: Permits to play 2048
+    default: false
+  thejp.2048.new:
+    description: Permits to start new 2048 game
+    default: false
+  thejp.2048.stats:
+    description: Permits to view top 10 highscores
+    default: false
+  thejp.2048.undo.unlimited:
+    description: Permits to do an unlimited amount of undo operations
+    default: false
+  thejp.2048.true:
+    description: Default permission, so commands are executed properly (Permissions are checked in the plugin!)
     default: true

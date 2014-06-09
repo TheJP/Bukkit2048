@@ -19,6 +19,15 @@ cmd:
   new: new
   stats: stats
 
+#This section defines permissions
+#(DONT CHANGE THEM, unless you know exactly what you do!)
+perm:
+  play: thejp.2048.play
+  new: thejp.2048.new
+  stats: thejp.2048.stats
+  #unlimited undo: players with this permission can do an unlimited amount of undo operations
+  unlimited-undo: thejp.2048.undo.unlimited
+
 #In the following section defines the translations in different languages
 #Feel free to change the values or add new languages
 lang:
@@ -42,6 +51,8 @@ lang:
     display-down: Ab
     display-left: Links
     display-score: Punkte
+
+    permission-message: Berechtigung <permission> ist notwendig
   enUs:
     cant-play-on-console: 2048 can't be played on the server console
     game-title: 2048
@@ -60,6 +71,8 @@ lang:
     display-down: Down
     display-left: Left
     display-score: Score
+
+    permission-message: Permission <permission> is needed
   huHU:
     cant-play-on-console: 2048 nem játszható conzolból
     game-title: 2048
@@ -78,6 +91,8 @@ lang:
     display-down: Le
     display-left: Balra
     display-score: Eredmény
+
+    permission-message: Permission <permission> is needed
 
 #This section allows to define callback commands for different events
 callback:
