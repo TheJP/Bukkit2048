@@ -45,6 +45,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 	private long announced = 0; //Stores, which scores were announced as highscore (antispam)
 
 	//** Configs **//
+	private boolean enabledPermissions;
 	private Permission permissionPlay;
 	private Permission permissionNew;
 	private Permission permissionStats;
@@ -127,7 +128,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 	 * @return True if the sender has the permission, false otherwise
 	 */
 	private boolean checkPermission(CommandSender sender, Permission permission){
-		if(sender.hasPermission(permission)){ return true; }
+		if(!enabledPermissions || sender.hasPermission(permission)){ return true; }
 		else{
 			sender.sendMessage(ChatColor.RED + getPhrase("permission-message"));
 			return false;
@@ -198,7 +199,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 			entry.getValue().getInventoryView().close();
 		}
 	}
-	
+
 	@Override
 	public void onLoad() {
 		//Load Configuration
@@ -211,6 +212,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 		callbackNewGame = config.getString("callback.cmd.new", null);
 		callbackStats = config.getString("callback.cmd.stats", null);
 		gameMode = config.getString("misc.game-mode", "2048").equals("64") ? GameMode.GM64 : GameMode.GM2048;
+		enabledPermissions = config.getBoolean("misc.perm", false);
 		permissionPlay = new Permission(config.getString("perm.play", "thejp.2048.play"));
 		permissionNew = new Permission(config.getString("perm.new", "thejp.2048.new"));
 		permissionStats = new Permission(config.getString("perm.stats", "thejp.2048.stats"));
