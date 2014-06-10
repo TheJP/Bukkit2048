@@ -77,6 +77,7 @@ lang:
     permission-message: Permission <permission> is needed
 
 #This section allows to define callback commands for different events
+#The commands have to be typed the same way as in the server console (e.g. play: tell admin hi)
 callback:
   cmd:
     play:
