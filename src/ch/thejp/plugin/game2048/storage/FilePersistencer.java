@@ -52,16 +52,6 @@ public class FilePersistencer implements IPersistencer {
 
 	@Override
 	public void write(IGameState gameState, String itemName) throws IOException {
-		DataOutputStream writer = new DataOutputStream(new FileOutputStream(path + itemName + ending, false));
-		try{
-			gameState.write(writer);
-		}finally{
-			writer.close();
-		}
-	}
-
-	@Override
-	public void read(IGameState gameState, String itemName) throws IOException {
 		File file = new File(path + itemName + ending);
 		//Create backup for undo operation
 		if(file.exists()){
@@ -71,7 +61,17 @@ public class FilePersistencer implements IPersistencer {
 			}
 		}
 		//Save new game state
-		DataInputStream reader = new DataInputStream(new FileInputStream(file));
+		DataOutputStream writer = new DataOutputStream(new FileOutputStream(file, false));
+		try{
+			gameState.write(writer);
+		}finally{
+			writer.close();
+		}
+	}
+
+	@Override
+	public void read(IGameState gameState, String itemName) throws IOException {
+		DataInputStream reader = new DataInputStream(new FileInputStream(path + itemName + ending));
 		try{
 			gameState.read(reader);
 		}finally{
