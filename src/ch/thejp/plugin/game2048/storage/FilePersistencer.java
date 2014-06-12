@@ -30,6 +30,7 @@ public class FilePersistencer implements IPersistencer {
 	//Changed in version 2.1.0 because saves are not backward compatible
 	//Another change in version 2.1.3 so different gamemode save files do not ever mix up
 	private String ending;
+	private final static String BACKUP_ENDING = ".bak";
 
 	/**
 	 * Constructor with path
@@ -61,7 +62,16 @@ public class FilePersistencer implements IPersistencer {
 
 	@Override
 	public void read(IGameState gameState, String itemName) throws IOException {
-		DataInputStream reader = new DataInputStream(new FileInputStream(path + itemName + ending));
+		File file = new File(path + itemName + ending);
+		//Create backup for undo operation
+		if(file.exists()){
+			File bakFile = new File(file.getCanonicalPath() + BACKUP_ENDING);
+			if(!bakFile.exists() || bakFile.delete()){
+				file.renameTo(bakFile);
+			}
+		}
+		//Save new game state
+		DataInputStream reader = new DataInputStream(new FileInputStream(file));
 		try{
 			gameState.read(reader);
 		}finally{
