@@ -54,7 +54,7 @@ public class FilePersistencer implements IPersistencer {
 	public void write(IGameState gameState, String itemName) throws IOException {
 		File file = new File(path + itemName + ending);
 		//Create backup for undo operation
-		if(file.exists()){
+		if(file.isFile()){
 			File bakFile = new File(file.getCanonicalPath() + BACKUP_ENDING);
 			if(!bakFile.exists() || bakFile.delete()){
 				file.renameTo(bakFile);
@@ -88,6 +88,8 @@ public class FilePersistencer implements IPersistencer {
 	public void delete(String itemName) throws IOException {
 		File item = new File(path + itemName + ending);
 		if(item.isFile()){ item.delete(); }
+		File bakFile = new File(item.getCanonicalPath() + BACKUP_ENDING);
+		if(bakFile.isFile()){ item.delete(); }
 	}
 
 	@Override
