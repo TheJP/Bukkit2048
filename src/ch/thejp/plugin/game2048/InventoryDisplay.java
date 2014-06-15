@@ -127,7 +127,7 @@ public class InventoryDisplay {
 	}
 
 	/**
-	 * Get default color of tiel in gamemode 2048
+	 * Get default color of tile in gamemode 2048
 	 * @param value
 	 * @return
 	 */
