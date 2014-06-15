@@ -54,10 +54,6 @@ public class InventoryDisplay {
 	 */
 	private void initContents(){
 		//** Read Materials from config **//
-//		Material fillerMaterial = Material.matchMaterial(config.getJPConfig().getString("misc.border-material", "STICK"));
-//		short fillerMeta = (short) config.getJPConfig().getInt("misc.border-metadata", 0);
-//		if(fillerMaterial != null){ filler = new ItemStack(fillerMaterial, 1, (short) fillerMeta); }
-//		else { filler = new ItemStack(Material.STICK); }
 		filler = getConfigMaterial("display.border", filler, 1);
 		arrowUp = getConfigMaterial("display.arrow.up", arrowUp, 1);
 		arrowRight = getConfigMaterial("display.arrow.right", arrowRight, 1);
