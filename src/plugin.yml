@@ -20,7 +20,7 @@ commands:
 permissions:
   thejp.2048.*:
     description: Contains every 2048 permission
-    default: op
+    default: false
     children:
       thejp.2048.play: true
       thejp.2048.new: true
