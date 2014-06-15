@@ -14,6 +14,7 @@ import ch.thejp.plugin.game2048.logic.Direction;
 import ch.thejp.plugin.game2048.logic.GameMode;
 import ch.thejp.plugin.game2048.logic.IGameLogic;
 import ch.thejp.plugin.game2048.logic.IGameState;
+import ch.thejp.plugin.game2048.storage.IUndoable;
 
 /**
  * Displays a GameState inside of a minecraft Inventory
@@ -29,6 +30,7 @@ public class InventoryDisplay {
 	private ItemStack[] contents;
 	private GameMode gameMode;
 	private IConfiguration config;
+	private IUndoable undoable;
 
 	//Materials with default values
 	private ItemStack arrowUp = new ItemStack(Material.FLINT);
@@ -36,16 +38,18 @@ public class InventoryDisplay {
 	private ItemStack arrowDown = new ItemStack(Material.HOPPER);
 	private ItemStack arrowLeft = new ItemStack(Material.CARROT_ITEM);
 	private ItemStack filler = new ItemStack(Material.STAINED_GLASS, 1, (short) 15);
+	private ItemStack undo = new ItemStack(Material.FLOWER_POT_ITEM);
 	private ItemStack emptyField = new ItemStack(Material.AIR);
 	private Material scoreMaterial = Material.STICK;
 	private Material zeroMaterial = Material.EGG;
 
-	public InventoryDisplay(Inventory inventory, IGameState gameState, GameMode mode, IConfiguration config) {
+	public InventoryDisplay(Inventory inventory, IGameState gameState, GameMode mode, IConfiguration config, IUndoable undoable) {
 		this.inventory = inventory;
 		this.gameState = gameState;
 		this.contents = new ItemStack[COLS*ROWS];
 		this.gameMode = mode;
 		this.config = config;
+		this.undoable = undoable;
 		initContents();
 	}
 	
@@ -59,12 +63,14 @@ public class InventoryDisplay {
 		arrowRight = getConfigMaterial("display.arrow.right", arrowRight, 1);
 		arrowDown = getConfigMaterial("display.arrow.down", arrowDown, 1);
 		arrowLeft = getConfigMaterial("display.arrow.left", arrowLeft, 1);
+		undo = getConfigMaterial("display.undo", undo, 1);
 		//** Add tooltips **//
 		changeDisplayName(arrowUp, ChatColor.GREEN + config.getPhrase("display-up"));
 		changeDisplayName(arrowRight, ChatColor.GREEN + config.getPhrase("display-right"));
 		changeDisplayName(arrowDown, ChatColor.GREEN + config.getPhrase("display-down"));
 		changeDisplayName(arrowLeft, ChatColor.GREEN + config.getPhrase("display-left"));
 		changeDisplayName(filler, " ");
+		changeDisplayName(undo, ChatColor.RED + config.getPhrase("display-undo"));
 		//** Create playfield border **//
 		contents[0] = contents[1] = contents[4] = contents[5] = filler;
 		contents[2] = contents[3] = arrowUp;
@@ -175,6 +181,8 @@ public class InventoryDisplay {
 				}
 			}
 		}
+		//undo button
+		contents[COLS-2] = (undoable.isUndoable() ? undo : new ItemStack(Material.AIR));
 		//score display
 		List<ItemStack> score = scoreToDisplay();
 		String stringScore = String.format("%s%s: %d", ChatColor.GOLD, config.getPhrase("display-score"), gameState.getScore());
@@ -202,6 +210,8 @@ public class InventoryDisplay {
 			gameLogic.move(Direction.Right); break;
 		case 5*COLS+2: case 5*COLS+3:
 			gameLogic.move(Direction.Down); break;
+		case COLS-2:
+			undoable.undo(); break;
 		default: break;
 		}
 	}

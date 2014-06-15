@@ -53,6 +53,7 @@ lang:
     display-down: Ab
     display-left: Links
     display-score: Punkte
+    display-undo: Zurück
 
     permission-message: Berechtigung <permission> ist notwendig
   enUs:
@@ -73,6 +74,7 @@ lang:
     display-down: Down
     display-left: Left
     display-score: Score
+    display-undo: Undo
 
     permission-message: Permission <permission> is needed
 
@@ -105,6 +107,9 @@ display:
     down-metadata:
     left-material:
     left-metadata:
+  #Custom undo material
+  undo-material:
+  undo-metadata:
   #Custom tile tooltip (mouse over) color
   tile-color:
   #Custom tile materials

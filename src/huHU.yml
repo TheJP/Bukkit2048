@@ -16,5 +16,6 @@
     display-down: Le
     display-left: Balra
     display-score: Eredmény
+    display-undo: Undo
 
     permission-message: Permission <permission> is needed

@@ -106,7 +106,7 @@ public class FilePersistencer implements IPersistencer {
 		File item = new File(path + itemName + ending);
 		if(item.isFile()){ item.delete(); }
 		File bakFile = new File(item.getCanonicalPath() + BACKUP_ENDING);
-		if(bakFile.isFile()){ item.delete(); }
+		if(bakFile.isFile()){ bakFile.delete(); }
 	}
 
 	@Override

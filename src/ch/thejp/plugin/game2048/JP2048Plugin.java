@@ -29,6 +29,7 @@ import ch.thejp.plugin.game2048.logic.IGameLogic;
 import ch.thejp.plugin.game2048.logic.IGameState;
 import ch.thejp.plugin.game2048.storage.FilePersistencer;
 import ch.thejp.plugin.game2048.storage.IPersistencer;
+import ch.thejp.plugin.game2048.storage.PersistenceUndoable;
 
 /**
  * View-code of the 2048 Plugin 
@@ -165,7 +166,8 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 			//Create Display
 			Inventory inventory = getServer().createInventory(
 					player, InventoryDisplay.COLS*InventoryDisplay.ROWS, getPhrase("game-title"));
-			InventoryDisplay display = new InventoryDisplay(inventory, gameState, gameMode, this);
+			InventoryDisplay display = new InventoryDisplay(inventory, gameState, gameMode, this, 
+				new PersistenceUndoable(persistencer, player.getName(), getLogger()));
 			display.render();
 			InventoryView inventoryView = player.openInventory(inventory); //Open Display
 			games.put(player.getName(), new PlayerGame(inventoryView, gameLogic, display)); //Save PlayerGame in RAM
@@ -286,10 +288,12 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 			HumanEntity player = event.getWhoClicked();
 			if(games.containsKey(player.getName())){
 				PlayerGame game = games.get(player.getName());
+				//Perform turn
 				game.getDisplay().performClick(game.getGameLogic(), event.getRawSlot());
-				game.getDisplay().render();
 				//Save game state
 				save(game.getGameLogic().getGameState(), player.getName());
+				//Render game state
+				game.getDisplay().render();
 				//Game over?
 				checkGameOver(game.getGameLogic().getGameState(), player);
 			}
