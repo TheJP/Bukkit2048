@@ -118,8 +118,8 @@ public class GameLogic implements IGameLogic {
 	}
 
 	@Override
-	public void move(Direction dir) {
-		if(gameState.isGameOver()){ return; }
+	public boolean move(Direction dir) {
+		if(gameState.isGameOver()){ return false; }
 		//The main moving and scoring algorithm is defined here
 		Strategy s = getMovingStrategy(dir);
 		int tileX, tileY;
@@ -164,9 +164,8 @@ public class GameLogic implements IGameLogic {
 			}while(cond);
 		}
 		//Add new tile
-		if(moved){
-			addRandomTile();
-		}
+		if(moved){ addRandomTile(); }
+		return moved;
 	}
 
 }

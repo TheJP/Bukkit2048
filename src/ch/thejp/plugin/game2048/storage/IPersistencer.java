@@ -19,6 +19,15 @@ public interface IPersistencer {
 	 */
 	void write(IGameState gameState, String itemName) throws IOException;
 	/**
+	 * Write the game state.
+	 * (where and how the state is saved is left to the concrete implementation)
+	 * @param gameState State which has to be saved
+	 * @param itemName Used as item identifier
+	 * @param backup (default: false) If a backup of the old version should be created
+	 * @throws IOException 
+	 */
+	void write(IGameState gameState, String itemName, boolean backup) throws IOException;
+	/**
 	 * Read the game state.
 	 * (from where and how the state is loaded is left to the concrete implementation)
 	 * @param gameState State in which the data has to be loaded

@@ -64,9 +64,9 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 	/**
 	 * Save given game state
 	 */
-	private void save(IGameState gameState, String itemName){
+	private void save(IGameState gameState, String itemName, boolean backup){
 		highscores.set(itemName, gameState.getScore()); //Sets the highscore if better then the old one
-		try { persistencer.write(gameState, itemName); }
+		try { persistencer.write(gameState, itemName, backup); }
 		catch (IOException e) { getLogger().log(Level.WARNING, "Could not write game save file", e); }
 		if(readHighscoresSuccess){ //Only write highscores if the highscores were read successfully (=> don't overwrite highscores)
 			try { persistencer.writeHighscores(highscores); }
@@ -161,7 +161,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 			}else{
 				//No: Start new game
 				gameLogic = new GameLogic(gameState, true, gameMode);
-				save(gameState, player.getName());
+				save(gameState, player.getName(), false);
 			}
 			//Create Display
 			Inventory inventory = getServer().createInventory(
@@ -289,9 +289,9 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 			if(games.containsKey(player.getName())){
 				PlayerGame game = games.get(player.getName());
 				//Perform turn
-				game.getDisplay().performClick(game.getGameLogic(), event.getRawSlot());
+				boolean undoable = game.getDisplay().performClick(game.getGameLogic(), event.getRawSlot());
 				//Save game state
-				save(game.getGameLogic().getGameState(), player.getName());
+				save(game.getGameLogic().getGameState(), player.getName(), undoable);
 				//Render game state
 				game.getDisplay().render();
 				//Game over?

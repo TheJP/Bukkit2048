@@ -52,9 +52,14 @@ public class FilePersistencer implements IPersistencer {
 
 	@Override
 	public void write(IGameState gameState, String itemName) throws IOException {
+		write(gameState, itemName, false);
+	}
+
+	@Override
+	public void write(IGameState gameState, String itemName, boolean backup) throws IOException {
 		File file = new File(path + itemName + ending);
 		//Create backup for undo operation
-		if(file.isFile()){
+		if(backup && file.isFile()){
 			File bakFile = new File(file.getCanonicalPath() + BACKUP_ENDING);
 			if(!bakFile.exists() || bakFile.delete()){
 				file.renameTo(bakFile);

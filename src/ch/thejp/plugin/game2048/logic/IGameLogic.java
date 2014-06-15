@@ -11,12 +11,12 @@ package ch.thejp.plugin.game2048.logic;
  */
 public interface IGameLogic {
 	/**
-	 * Returns the current gamestate
+	 * Returns the current gamestate.
 	 * @return
 	 */
 	IGameState getGameState();
 	/**
-	 * Sets the given gamestate
+	 * Sets the given gamestate.
 	 * @param state
 	 */
 	void setGameState(IGameState state);
@@ -26,8 +26,9 @@ public interface IGameLogic {
 	 */
 	GameMode getGameMode();
 	/**
-	 * Make a gamemove in the given direction
+	 * Make a gamemove in the given direction.
 	 * @param dir
+	 * @return true=moved tiles in this turn, false otherwise
 	 */
-	void move(Direction dir);
+	boolean move(Direction dir);
 }

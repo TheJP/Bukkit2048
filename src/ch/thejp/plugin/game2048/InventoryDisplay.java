@@ -199,21 +199,25 @@ public class InventoryDisplay {
 	 * Perform a click event on the board
 	 * @param gameLogic Object to perform the click on it
 	 * @param slot Slot, in which the player clicked
+	 * @return If this is a turn, which could be "undoable"
 	 */
-	public void performClick(IGameLogic gameLogic, int slot){
+	public boolean performClick(IGameLogic gameLogic, int slot){
+		Direction dir = null;
 		switch (slot) {
 		case 2: case 3:
-			gameLogic.move(Direction.Up); break;
+			dir = Direction.Up; break;
 		case 2*COLS: case 3*COLS:
-			gameLogic.move(Direction.Left); break;
+			dir = Direction.Left; break;
 		case 2*COLS+5: case 3*COLS+5:
-			gameLogic.move(Direction.Right); break;
+			dir = Direction.Right; break;
 		case 5*COLS+2: case 5*COLS+3:
-			gameLogic.move(Direction.Down); break;
+			dir = Direction.Down; break;
 		case COLS-2:
 			undoable.undo(); break;
 		default: break;
 		}
+		if(dir != null){ return gameLogic.move(dir); }
+		else { return false; }
 	}
 
 	public Inventory getInventory() {
