@@ -11,7 +11,7 @@ import ch.thejp.plugin.game2048.logic.IGameState;
  */
 public interface IPersistencer {
 	/**
-	 * Write the game state
+	 * Write the game state.
 	 * (where and how the state is saved is left to the concrete implementation)
 	 * @param gameState State which has to be saved
 	 * @param itemName Used as item identifier
@@ -19,7 +19,7 @@ public interface IPersistencer {
 	 */
 	void write(IGameState gameState, String itemName) throws IOException;
 	/**
-	 * Read the game state
+	 * Read the game state.
 	 * (from where and how the state is loaded is left to the concrete implementation)
 	 * @param gameState State in which the data has to be loaded
 	 * @param itemName Used as item identifier (Same id should give same results)
@@ -27,25 +27,38 @@ public interface IPersistencer {
 	 */
 	void read(IGameState gameState, String itemName) throws IOException;
 	/**
-	 * Checks if the Item with given identifier is available
+	 * Replaces the current save with its backup to undo the last write action.
+	 * @throws IOException
+	 */
+	void undo(String itemName) throws IOException;
+	/**
+	 * Checks if the Item with given identifier is available.
 	 * @param itemName Name of the searched item
 	 * @return true=available, false otherwise
 	 * @throws IOException
 	 */
 	boolean isAvailable(String itemName);
 	/**
-	 * Deletes the game state
+	 * Checks if the Item with given identifier is available.
+	 * @param itemName Name of the searched item
+	 * @param backup (default: false) true=check if the backup item is available
+	 * @return true=available, false otherwise
+	 * @throws IOException
+	 */
+	boolean isAvailable(String itemName, boolean backup);
+	/**
+	 * Deletes the game state.
 	 * @param itemName Identifier of the state
 	 */
 	void delete(String itemName) throws IOException;
 	/**
-	 * Reads the given highscores from the persistent storage to the given HighscoreManager
+	 * Reads the given highscores from the persistent storage to the given HighscoreManager.
 	 * @param highscores
 	 * @throws IOException
 	 */
 	void readHighscores(HighscoreManager highscores) throws IOException;
 	/**
-	 * Stores the given highscores persistent
+	 * Stores the given highscores persistent.
 	 * @param highscores
 	 * @throws IOException
 	 */

@@ -80,8 +80,25 @@ public class FilePersistencer implements IPersistencer {
 	}
 
 	@Override
+	public void undo(String itemName) throws IOException {
+		File file = new File(path + itemName + ending);
+		File bakFile = new File(file.getCanonicalPath() + BACKUP_ENDING);
+		//Replace current file with backup
+		if(bakFile.isFile()){
+			if(file.isFile() && file.delete()){
+				bakFile.renameTo(file);
+			}
+		}
+	}
+
+	@Override
+	public boolean isAvailable(String itemName, boolean backup) {
+		return new File(path + itemName + ending + (backup ? BACKUP_ENDING : "")).isFile();
+	}
+
+	@Override
 	public boolean isAvailable(String itemName) {
-		return new File(path + itemName + ending).isFile();
+		return isAvailable(itemName, false);
 	}
 
 	@Override
