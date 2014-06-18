@@ -167,7 +167,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 			Inventory inventory = getServer().createInventory(
 					player, InventoryDisplay.COLS*InventoryDisplay.ROWS, getPhrase("game-title"));
 			InventoryDisplay display = new InventoryDisplay(inventory, gameState, gameMode, this, 
-				new PersistenceUndoable(persistencer, player.getName(), getLogger()));
+				new PersistenceUndoable(gameState, persistencer, player.getName(), getLogger()));
 			display.render();
 			InventoryView inventoryView = player.openInventory(inventory); //Open Display
 			games.put(player.getName(), new PlayerGame(inventoryView, gameLogic, display)); //Save PlayerGame in RAM

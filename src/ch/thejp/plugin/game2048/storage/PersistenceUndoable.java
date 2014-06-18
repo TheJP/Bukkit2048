@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import ch.thejp.plugin.game2048.logic.GameState;
 import ch.thejp.plugin.game2048.logic.IGameState;
 
 /**
@@ -14,6 +13,7 @@ import ch.thejp.plugin.game2048.logic.IGameState;
  */
 public class PersistenceUndoable implements IUndoable {
 
+	private IGameState gameState;
 	private IPersistencer persistencer;
 	private String itemName;
 	private Logger logger;
@@ -23,7 +23,8 @@ public class PersistenceUndoable implements IUndoable {
 	 * @param itemName Item, to which this adapter belongs
 	 * @param logger Logger, to log IOExceptions into
 	 */
-	public PersistenceUndoable(IPersistencer persistencer, String itemName, Logger logger) {
+	public PersistenceUndoable(IGameState gameState, IPersistencer persistencer, String itemName, Logger logger) {
+		this.gameState = gameState;
 		this.persistencer = persistencer;
 		this.itemName = itemName;
 		this.logger = logger;
@@ -35,15 +36,13 @@ public class PersistenceUndoable implements IUndoable {
 	}
 
 	@Override
-	public IGameState undo() {
+	public void undo() {
 		try {
 			//Load backup file
 			persistencer.undo(itemName);
 			//Read backup file
-			IGameState undoneGameState = new GameState();
-			persistencer.read(undoneGameState, itemName);
-			return undoneGameState;
+			persistencer.read(gameState, itemName);
 		}
-		catch (IOException e) { logger.log(Level.WARNING, "Could not undo turn", e); return null; }
+		catch (IOException e) { logger.log(Level.WARNING, "Could not undo turn", e); }
 	}
 }
