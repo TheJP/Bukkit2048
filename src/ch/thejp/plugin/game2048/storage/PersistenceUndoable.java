@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import ch.thejp.plugin.game2048.logic.GameState;
+import ch.thejp.plugin.game2048.logic.IGameState;
+
 /**
  * Adapbter class to IPersistencer, which implements IUndoable
  * @author JP
@@ -32,8 +35,15 @@ public class PersistenceUndoable implements IUndoable {
 	}
 
 	@Override
-	public void undo() {
-		try { persistencer.undo(itemName); }
-		catch (IOException e) { logger.log(Level.WARNING, "Could not read game save file", e); return; }
+	public IGameState undo() {
+		try {
+			//Load backup file
+			persistencer.undo(itemName);
+			//Read backup file
+			IGameState undoneGameState = new GameState();
+			persistencer.read(undoneGameState, itemName);
+			return undoneGameState;
+		}
+		catch (IOException e) { logger.log(Level.WARNING, "Could not undo turn", e); return null; }
 	}
 }

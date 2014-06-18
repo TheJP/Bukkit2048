@@ -90,7 +90,7 @@ public class FilePersistencer implements IPersistencer {
 		File bakFile = new File(file.getCanonicalPath() + BACKUP_ENDING);
 		//Replace current file with backup
 		if(bakFile.isFile()){
-			if(file.isFile() && file.delete()){
+			if(!file.isFile() || file.delete()){
 				bakFile.renameTo(file);
 			}
 		}
