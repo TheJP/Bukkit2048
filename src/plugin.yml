@@ -37,7 +37,7 @@ permissions:
     default: false
   thejp.2048.undo.unlimited:
     description: Permits to do an unlimited amount of undo operations
-    default: false
+    default: op
   thejp.2048.true:
     description: Default permission, so commands are executed properly (Permissions are checked in the plugin!)
     default: true

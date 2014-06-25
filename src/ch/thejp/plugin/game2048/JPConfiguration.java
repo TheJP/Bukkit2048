@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
 
 import ch.thejp.plugin.game2048.logic.GameMode;
 
@@ -72,7 +73,9 @@ public class JPConfiguration implements IConfiguration {
 	 * @return True if the sender has the permission, false otherwise
 	 */
 	public boolean checkPermission(CommandSender sender, Permission permission){
-		return !isEnabledPermissions() || sender.hasPermission(permission);
+		//If the default of the permission is "op", the permission is considered a admin / vip permission.
+		//This admin / vip permissions are checked even if permissions are turned off
+		return (permission.getDefault() != PermissionDefault.OP && !isEnabledPermissions()) || sender.hasPermission(permission);
 	}
 
 	public boolean isEnabledPermissions() {

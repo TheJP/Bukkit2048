@@ -151,7 +151,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 			//Create Inventory for the display
 			Inventory inventory = getServer().createInventory(player, InventoryDisplay.COLS*InventoryDisplay.ROWS, config.getPhrase("game-title"));
 			//Adapter, which allows the inventory view to undo turns
-			IUndoable undoable = new PersistenceUndoable(gameState, persistencer, player.getName(), getLogger(), player.hasPermission(config.getPermissionUnlimitedUndo()));
+			IUndoable undoable = new PersistenceUndoable(gameState, persistencer, player, getLogger(), config);
 			//Create the display and render it (=show it to the player)
 			InventoryDisplay display = new InventoryDisplay(inventory, gameState, config, undoable);
 			display.render();
