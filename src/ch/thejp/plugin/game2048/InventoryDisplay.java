@@ -28,7 +28,6 @@ public class InventoryDisplay {
 	private Inventory inventory;
 	private IGameState gameState;
 	private ItemStack[] contents;
-	private GameMode gameMode;
 	private IConfiguration config;
 	private IUndoable undoable;
 
@@ -43,11 +42,10 @@ public class InventoryDisplay {
 	private Material scoreMaterial = Material.STICK;
 	private Material zeroMaterial = Material.EGG;
 
-	public InventoryDisplay(Inventory inventory, IGameState gameState, GameMode mode, IConfiguration config, IUndoable undoable) {
+	public InventoryDisplay(Inventory inventory, IGameState gameState, IConfiguration config, IUndoable undoable) {
 		this.inventory = inventory;
 		this.gameState = gameState;
 		this.contents = new ItemStack[COLS*ROWS];
-		this.gameMode = mode;
 		this.config = config;
 		this.undoable = undoable;
 		initContents();
@@ -149,7 +147,7 @@ public class InventoryDisplay {
 	private ItemStack getTileItems(long value){
 		if(value < 0){ value = 0; }
 		ItemStack s;
-		if(gameMode == GameMode.GM64){
+		if(config.getGameMode() == GameMode.GM64){
 			if(value > 63){ value = 63; }
 			//Default value
 			s = new ItemStack(Material.WOOL, (byte) value, (short) (value / 4));

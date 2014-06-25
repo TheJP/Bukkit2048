@@ -10,8 +10,6 @@ import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,7 +21,6 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import ch.thejp.plugin.game2048.logic.GameLogic;
-import ch.thejp.plugin.game2048.logic.GameMode;
 import ch.thejp.plugin.game2048.logic.GameState;
 import ch.thejp.plugin.game2048.logic.IGameLogic;
 import ch.thejp.plugin.game2048.logic.IGameState;
@@ -36,32 +33,16 @@ import ch.thejp.plugin.game2048.storage.PersistenceUndoable;
  * View-code of the 2048 Plugin 
  * @author JP
  */
-public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration {
+public class JP2048Plugin extends JavaPlugin implements Listener {
 
 	//Map Playername->Game
 	private Map<String, PlayerGame> games = new HashMap<String, PlayerGame>();
 	private IPersistencer persistencer;
+	private JPConfiguration config = null;
 	//Highscores
 	private HighscoreManager highscores;
 	private boolean readHighscoresSuccess = false;
 	private long announced = 0; //Stores, which scores were announced as highscore (antispam)
-
-	//** Configs **//
-	private boolean enabledPermissions;
-	private Permission permissionPlay;
-	private Permission permissionNew;
-	private Permission permissionStats;
-	private Permission permissionUnlimitedUndo;
-	private final String configFilename = "plugins/JP2048.yml";
-	private Configuration config = null;
-	private String langSection = "";
-	private String commandPlay = "";
-	private String commandNewGame = "";
-	private String commandStats = "";
-	private String callbackPlay = null;
-	private String callbackNewGame = null;
-	private String callbackStats = null;
-	private GameMode gameMode = GameMode.GM64;
 
 	/**
 	 * Save given game state
@@ -85,10 +66,10 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 	private void printHighscores(CommandSender receiver){
 		String format;
 		if(receiver instanceof Player){
-			receiver.sendMessage(ChatColor.GREEN + String.format("%s (%s, %s, %s)", getPhrase("hs"), getPhrase("hs-rank"), getPhrase("hs-score"), getPhrase("hs-name")));
+			receiver.sendMessage(ChatColor.GREEN + String.format("%s (%s, %s, %s)", config.getPhrase("hs"), config.getPhrase("hs-rank"), config.getPhrase("hs-score"), config.getPhrase("hs-name")));
 			format = "%d. %d %s";
 		}else{
-			receiver.sendMessage(ChatColor.GREEN + String.format("%4s %11s %s", getPhrase("hs-rank"), getPhrase("hs-score"), getPhrase("hs-name")));
+			receiver.sendMessage(ChatColor.GREEN + String.format("%4s %11s %s", config.getPhrase("hs-rank"), config.getPhrase("hs-score"), config.getPhrase("hs-name")));
 			format = "%4d. %10d %s";
 		}
 		int rank = 0, lastRank = 1; long lastScore = Long.MAX_VALUE;
@@ -97,7 +78,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 			if(entry.getValue() < lastScore){ lastRank = rank; lastScore = entry.getValue(); }
 			receiver.sendMessage(String.format(format, lastRank, lastScore, entry.getKey()));
 			//Limit highscores
-			if(rank >= config.getInt("misc.stats-max-count", 10)){ break; }
+			if(rank >= config.getStatsMaxCount()){ break; }
 		}
 	}
 
@@ -106,7 +87,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 	 */
 	private void checkGameOver(IGameState gameState, HumanEntity player){
 		if(gameState.isGameOver() && player instanceof Player){
-			((Player) player).sendMessage(ChatColor.RED + getPhrase("game-over"));
+			((Player) player).sendMessage(ChatColor.RED + config.getPhrase("game-over"));
 			//Check for new highscore
 			Entry<String, Long>[] hs = highscores.getSorted();
 			//Is the current score a new highscore?
@@ -117,7 +98,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 			){
 				//Yes: Announce
 				getServer().broadcastMessage(ChatColor.GREEN +
-						getPhrase("new-highscore").replace("<player>", player.getName()));
+						config.getPhrase("new-highscore").replace("<player>", player.getName()));
 				announced = gameState.getScore();
 			}
 		}
@@ -131,9 +112,9 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 	 * @return True if the sender has the permission, false otherwise
 	 */
 	private boolean checkPermission(CommandSender sender, Permission permission){
-		if(!enabledPermissions || sender.hasPermission(permission)){ return true; }
+		if(config.checkPermission(sender, permission)){ return true; }
 		else{
-			sender.sendMessage(ChatColor.RED + getPhrase("permission-message").replace("<permission>", permission.getName()));
+			sender.sendMessage(ChatColor.RED + config.getPhrase("permission-message").replace("<permission>", permission.getName()));
 			return false;
 		}
 	}
@@ -158,38 +139,23 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 				//Yes: Read save file
 				try { persistencer.read(gameState, player.getName()); }
 				catch (IOException e) { getLogger().log(Level.WARNING, "Could not read game save file", e); return; }
-				gameLogic = new GameLogic(gameState, false, gameMode);
+				gameLogic = new GameLogic(gameState, false, config.getGameMode());
 				checkGameOver(gameState, player);
 			}else{
 				//No: Start new game
-				gameLogic = new GameLogic(gameState, true, gameMode);
+				gameLogic = new GameLogic(gameState, true, config.getGameMode());
 				save(gameState, player.getName(), false);
 			}
-			//Create Display
-			Inventory inventory = getServer().createInventory(
-					player, InventoryDisplay.COLS*InventoryDisplay.ROWS, getPhrase("game-title"));
+			//Create Inventory for the display
+			Inventory inventory = getServer().createInventory(player, InventoryDisplay.COLS*InventoryDisplay.ROWS, config.getPhrase("game-title"));
 			//Adapter, which allows the inventory view to undo turns
-			IUndoable undoable = new PersistenceUndoable(gameState, persistencer, player.getName(), getLogger(), player.hasPermission(permissionUnlimitedUndo));
-			InventoryDisplay display = new InventoryDisplay(inventory, gameState, gameMode, this, undoable);
+			IUndoable undoable = new PersistenceUndoable(gameState, persistencer, player.getName(), getLogger(), player.hasPermission(config.getPermissionUnlimitedUndo()));
+			//Create the display and render it (=show it to the player)
+			InventoryDisplay display = new InventoryDisplay(inventory, gameState, config, undoable);
 			display.render();
 			InventoryView inventoryView = player.openInventory(inventory); //Open Display
 			games.put(player.getName(), new PlayerGame(inventoryView, gameLogic, display)); //Save PlayerGame in RAM
 		}
-	}
-
-	@Override
-	public String getPhrase(String phrase){
-		return config.getString(langSection + phrase, phrase);
-	}
-
-	@Override
-	public Configuration getJPConfig(){
-		return config;
-	}
-
-	@Override
-	public GameMode getGameMode() {
-		return gameMode;
 	}
 
 	@Override
@@ -207,26 +173,13 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 
 	@Override
 	public void onLoad() {
-		//Load Configuration
-		config = YamlConfiguration.loadConfiguration(new File(configFilename));
-		langSection = "lang." + config.getString("lang.lang", "enUs") + ".";
-		commandPlay = config.getString("cmd.play", "2048");
-		commandNewGame = config.getString("cmd.new", "new");
-		commandStats = config.getString("cmd.stats", "stats");
-		callbackPlay = config.getString("callback.cmd.play", null);
-		callbackNewGame = config.getString("callback.cmd.new", null);
-		callbackStats = config.getString("callback.cmd.stats", null);
-		gameMode = config.getString("misc.game-mode", "2048").equals("64") ? GameMode.GM64 : GameMode.GM2048;
-		enabledPermissions = config.getBoolean("misc.perm", false);
-		permissionPlay = new Permission(config.getString("perm.play", "thejp.2048.play"));
-		permissionNew = new Permission(config.getString("perm.new", "thejp.2048.new"));
-		permissionStats = new Permission(config.getString("perm.stats", "thejp.2048.stats"));
-		permissionUnlimitedUndo = new Permission(config.getString("perm.unlimited-undo", "thejp.2048.undo.unlimited"));
+		//Load config
+		config = new JPConfiguration();
 		//Create Persistencer
-		String storagePath = config.getString("storage.path", "plugins/JP2048/");
+		String storagePath = config.getStoragePath();
 		File storage = new File(storagePath);
 		storage.mkdirs(); //Create folder structure if it doesn' exist
-		persistencer = new FilePersistencer(storage.getAbsolutePath() + File.separatorChar, this);
+		persistencer = new FilePersistencer(storage.getAbsolutePath() + File.separatorChar, config);
 		//Load highscores
 		highscores = new HighscoreManager();
 		try { persistencer.readHighscores(highscores); readHighscoresSuccess = true; }
@@ -240,42 +193,42 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		//Is the paly command entered?
-		if(command.getName().equals(commandPlay)){
+		if(command.getName().equals(config.getCommandPlay())){
 			//** print stats command **//
-			if(args.length > 0 && args[0].equals(commandStats)){
+			if(args.length > 0 && args[0].equals(config.getCommandStats())){
 				//Check for the stats permission
-				if(checkPermission(sender, permissionStats)){
+				if(checkPermission(sender, config.getPermissionStats())){
 					printHighscores(sender);
 					//Execute callback
-					if(callbackStats != null){
-						getServer().dispatchCommand(getServer().getConsoleSender(), callbackStats);
+					if(config.getCallbackStats() != null){
+						getServer().dispatchCommand(getServer().getConsoleSender(), config.getCallbackStats());
 					}
 				}
 			}
 			//Yes: Is the sender a player?
 			else if(!(sender instanceof Player)){
-				sender.sendMessage(getPhrase("cant-play-on-console"));
+				sender.sendMessage(config.getPhrase("cant-play-on-console"));
 			} else {
 				//Yes: Show 2048 game board
 				Player player = (Player)sender;
-				if(args.length > 0 && args[0].equals(commandNewGame)){
+				if(args.length > 0 && args[0].equals(config.getCommandNewGame())){
 					//Check for "new" permission
-					if(!checkPermission(sender, permissionNew)) { return true; }
+					if(!checkPermission(sender, config.getPermissionNew())) { return true; }
 					//** Start new game **//
 					games.remove(player.getName());
 					try { persistencer.delete(player.getName()); }
 					catch (IOException e) { getLogger().log(Level.WARNING, "Could not delete game save file", e); return true; }
 					//Execute callback
-					if(callbackNewGame != null){
-						getServer().dispatchCommand(getServer().getConsoleSender(), callbackNewGame);
+					if(config.getCallbackNewGame() != null){
+						getServer().dispatchCommand(getServer().getConsoleSender(), config.getCallbackNewGame());
 					}
 				} else {
 					//Check for "play" permission
-					if(!checkPermission(sender, permissionPlay)) { return true; }
+					if(!checkPermission(sender, config.getPermissionPlay())) { return true; }
 					//** Play existing game **//
 					//Execute callback
-					if(callbackPlay != null){
-						getServer().dispatchCommand(getServer().getConsoleSender(), callbackPlay);
+					if(config.getCallbackPlay() != null){
+						getServer().dispatchCommand(getServer().getConsoleSender(), config.getCallbackPlay());
 					}
 				}
 				play(player);
@@ -286,7 +239,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 
 	@EventHandler
 	public void onInventory(InventoryClickEvent event){
-		if(event.getInventory().getName().equals(getPhrase("game-title"))){
+		if(event.getInventory().getName().equals(config.getPhrase("game-title"))){
 			event.setCancelled(true);
 			//Perform click if possible
 			HumanEntity player = event.getWhoClicked();
