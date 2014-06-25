@@ -150,7 +150,6 @@ public class FilePersistencer implements IPersistencer {
 		try{
 			//Write heading
 			writer.writeLine(new Object[]{ config.getPhrase("hs-rank"), config.getPhrase("hs-score"), config.getPhrase("hs-name") });
-			//Entry<String, Long>[] entries = highscores.getSorted();
 			int rank = 0, lastRank = 1; long lastScore = Long.MAX_VALUE;
 			for(Entry<String, Long> row : highscores.getSorted()){
 				++rank;
