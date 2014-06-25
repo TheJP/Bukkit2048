@@ -178,10 +178,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 		//Load config
 		config = new JPConfiguration(YamlConfiguration.loadConfiguration(new File(configFilename)));
 		//Create Persistencer
-		String storagePath = config.getStoragePath();
-		File storage = new File(storagePath);
-		storage.mkdirs(); //Create folder structure if it doesn' exist
-		persistencer = new FilePersistencer(storage.getAbsolutePath() + File.separatorChar, config);
+		persistencer = new FilePersistencer(config);
 		//Load highscores
 		highscores = new HighscoreManager();
 		try { persistencer.readHighscores(highscores); readHighscoresSuccess = true; }

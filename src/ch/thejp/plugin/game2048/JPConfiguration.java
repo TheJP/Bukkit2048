@@ -105,4 +105,8 @@ public class JPConfiguration implements IConfiguration {
 	public String getStoragePath() {
 		return config.getString("storage.path", "plugins/JP2048/");
 	}
+
+	public String getHighscoreFile() {
+		return config.getString("storage.highscore-file", "hs.csv");
+	}
 }

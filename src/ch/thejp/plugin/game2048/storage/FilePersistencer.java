@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Map.Entry;
 
 import ch.thejp.plugin.game2048.HighscoreManager;
-import ch.thejp.plugin.game2048.IConfiguration;
+import ch.thejp.plugin.game2048.JPConfiguration;
 import ch.thejp.plugin.game2048.logic.GameMode;
 import ch.thejp.plugin.game2048.logic.IGameState;
 
@@ -22,32 +22,39 @@ import ch.thejp.plugin.game2048.logic.IGameState;
  */
 public class FilePersistencer implements IPersistencer {
 
-	private String path;
-	private String highscoreFile;
-	private String highscoreColRank = "Rang";
-	private String highscoreColPoints = "Punkte";
-	private String highscoreColName = "Name";
-	//Changed in version 2.1.0 because saves are not backward compatible
-	//Another change in version 2.1.3 so different gamemode save files do not ever mix up
-	private String ending;
+	private String path = "";
 	private final static String BACKUP_ENDING = ".bak";
+	JPConfiguration config = null;
 
 	/**
 	 * Constructor with path
 	 * @param path Folder in which the items have to be stored
 	 */
-	public FilePersistencer(String path, IConfiguration config) {
-		//Path has to end with the path separator
-		assert path.charAt(path.length()-1) == File.separatorChar : "Invalid path";
-		this.path = path;
-		//Highscore Filename
-		this.highscoreFile = config.getJPConfig().getString("storage.highscore-file", "hs.csv");
-		//Highscore headings
-		this.highscoreColRank = config.getPhrase("hs-rank");
-		this.highscoreColPoints = config.getPhrase("hs-score");
-		this.highscoreColName = config.getPhrase("hs-name");
-		//Different endings for 64 and 2048 gamemode
-		ending = config.getGameMode() == GameMode.GM64 ? ".s64" : ".sav";
+	public FilePersistencer(JPConfiguration config) {
+		this.config = config;
+	}
+
+	/**
+	 * Generates the correct ending according to the config.
+	 * Different endings for 64 and 2048 gamemode
+	 * @return Ending in the format ".eee"
+	 */
+	protected String getEnding() {
+		return config.getGameMode() == GameMode.GM64 ? ".s64" : ".sav";
+	}
+
+	/**
+	 * Generates the correct path according to the config
+	 * @return
+	 */
+	protected String getPath() {
+		File storage = new File(config.getStoragePath());
+		String path = storage.getAbsolutePath() + File.separatorChar;
+		if(!this.path.equals(path)){
+			storage.mkdirs(); //Create folder structure if it doesn' exist
+			this.path = path;
+		}
+		return path;
 	}
 
 	@Override
@@ -57,7 +64,7 @@ public class FilePersistencer implements IPersistencer {
 
 	@Override
 	public void write(IGameState gameState, String itemName, boolean backup) throws IOException {
-		File file = new File(path + itemName + ending);
+		File file = new File(getPath() + itemName + getEnding());
 		//Create backup for undo operation
 		if(backup && file.isFile()){
 			File bakFile = new File(file.getCanonicalPath() + BACKUP_ENDING);
@@ -76,7 +83,7 @@ public class FilePersistencer implements IPersistencer {
 
 	@Override
 	public void read(IGameState gameState, String itemName) throws IOException {
-		DataInputStream reader = new DataInputStream(new FileInputStream(path + itemName + ending));
+		DataInputStream reader = new DataInputStream(new FileInputStream(getPath() + itemName + getEnding()));
 		try{
 			gameState.read(reader);
 		}finally{
@@ -86,7 +93,7 @@ public class FilePersistencer implements IPersistencer {
 
 	@Override
 	public void undo(String itemName, boolean unlimited) throws IOException {
-		File file = new File(path + itemName + ending);
+		File file = new File(getPath() + itemName + getEnding());
 		File bakFile = new File(file.getCanonicalPath() + BACKUP_ENDING);
 		//Replace current file with backup
 		if(bakFile.isFile()){
@@ -98,7 +105,7 @@ public class FilePersistencer implements IPersistencer {
 
 	@Override
 	public boolean isAvailable(String itemName, boolean backup) {
-		return new File(path + itemName + ending + (backup ? BACKUP_ENDING : "")).isFile();
+		return new File(getPath() + itemName + getEnding() + (backup ? BACKUP_ENDING : "")).isFile();
 	}
 
 	@Override
@@ -108,7 +115,7 @@ public class FilePersistencer implements IPersistencer {
 
 	@Override
 	public void delete(String itemName) throws IOException {
-		File item = new File(path + itemName + ending);
+		File item = new File(getPath() + itemName + getEnding());
 		if(item.isFile()){ item.delete(); }
 		File bakFile = new File(item.getCanonicalPath() + BACKUP_ENDING);
 		if(bakFile.isFile()){ bakFile.delete(); }
@@ -116,9 +123,10 @@ public class FilePersistencer implements IPersistencer {
 
 	@Override
 	public void readHighscores(HighscoreManager highscores) throws IOException {
-		File highscoreCheckFile = new File(path + highscoreFile);
+		String path = getPath(), hsFile = config.getHighscoreFile();
+		File highscoreCheckFile = new File(path + hsFile);
 		if(!highscoreCheckFile.exists()){ return; }
-		CSVReader reader = new CSVReader(new BufferedReader(new FileReader(path + highscoreFile)));
+		CSVReader reader = new CSVReader(new BufferedReader(new FileReader(path + hsFile)));
 		try{
 			reader.readLine(); //Read Headings
 			String[] values;
@@ -138,10 +146,10 @@ public class FilePersistencer implements IPersistencer {
 
 	@Override
 	public void writeHighscores(HighscoreManager highscores) throws IOException {
-		CSVWriter writer = new CSVWriter(new FileWriter(path + highscoreFile, false));
+		CSVWriter writer = new CSVWriter(new FileWriter(getPath() + config.getHighscoreFile(), false));
 		try{
 			//Write heading
-			writer.writeLine(new Object[]{ highscoreColRank, highscoreColPoints, highscoreColName });
+			writer.writeLine(new Object[]{ config.getPhrase("hs-rank"), config.getPhrase("hs-score"), config.getPhrase("hs-name") });
 			//Entry<String, Long>[] entries = highscores.getSorted();
 			int rank = 0, lastRank = 1; long lastScore = Long.MAX_VALUE;
 			for(Entry<String, Long> row : highscores.getSorted()){
