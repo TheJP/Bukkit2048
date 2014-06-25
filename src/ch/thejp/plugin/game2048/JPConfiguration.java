@@ -1,21 +1,17 @@
 package ch.thejp.plugin.game2048;
 
-import java.io.File;
-
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.permissions.Permission;
 
 import ch.thejp.plugin.game2048.logic.GameMode;
 
 public class JPConfiguration implements IConfiguration {
 
-	private final String configFilename = "plugins/JP2048.yml";
 	private Configuration config = null;
 
-	public JPConfiguration(){
-		reload();
+	public JPConfiguration(Configuration config){
+		this.config = config;
 	}
 
 	/**
@@ -29,8 +25,8 @@ public class JPConfiguration implements IConfiguration {
 	/**
 	 * Loads / Reloads the configuration.
 	 */
-	public void reload(){
-		config = YamlConfiguration.loadConfiguration(new File(configFilename));
+	public void reload(Configuration config){
+		this.config = config;
 	}
 
 	@Override

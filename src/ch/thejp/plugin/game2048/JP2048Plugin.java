@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,6 +40,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 	private Map<String, PlayerGame> games = new HashMap<String, PlayerGame>();
 	private IPersistencer persistencer;
 	private JPConfiguration config = null;
+	private final String configFilename = "plugins/JP2048.yml";
 	//Highscores
 	private HighscoreManager highscores;
 	private boolean readHighscoresSuccess = false;
@@ -174,7 +176,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener {
 	@Override
 	public void onLoad() {
 		//Load config
-		config = new JPConfiguration();
+		config = new JPConfiguration(YamlConfiguration.loadConfiguration(new File(configFilename)));
 		//Create Persistencer
 		String storagePath = config.getStoragePath();
 		File storage = new File(storagePath);
