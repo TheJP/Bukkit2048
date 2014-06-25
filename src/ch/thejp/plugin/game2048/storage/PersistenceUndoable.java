@@ -36,7 +36,7 @@ public class PersistenceUndoable implements IUndoable {
 
 	@Override
 	public boolean isUndoable() {
-		return persistencer.isAvailable(itemName, true);
+		return unlimited && persistencer.isAvailable(itemName, true);
 	}
 
 	@Override
