@@ -28,40 +28,30 @@ public class InventoryDisplay {
 	private Inventory inventory;
 	private IGameState gameState;
 	private ItemStack[] contents;
-	private IConfiguration config;
+	private JPConfiguration config;
 	private IUndoable undoable;
 
-	//Materials with default values
-	private ItemStack arrowUp = new ItemStack(Material.FLINT);
-	private ItemStack arrowRight = new ItemStack(Material.ARROW);
-	private ItemStack arrowDown = new ItemStack(Material.HOPPER);
-	private ItemStack arrowLeft = new ItemStack(Material.CARROT_ITEM);
-	private ItemStack filler = new ItemStack(Material.STAINED_GLASS, 1, (short) 15);
-	private ItemStack undo = new ItemStack(Material.FLOWER_POT_ITEM);
 	private ItemStack emptyField = new ItemStack(Material.AIR);
-	private Material scoreMaterial = Material.STICK;
-	private Material zeroMaterial = Material.EGG;
 
-	public InventoryDisplay(Inventory inventory, IGameState gameState, IConfiguration config, IUndoable undoable) {
+	public InventoryDisplay(Inventory inventory, IGameState gameState, JPConfiguration config, IUndoable undoable) {
 		this.inventory = inventory;
 		this.gameState = gameState;
 		this.contents = new ItemStack[COLS*ROWS];
 		this.config = config;
 		this.undoable = undoable;
-		initContents();
 	}
 	
 	/**
 	 * Initialize frame of the display
 	 */
 	private void initContents(){
-		//** Read Materials from config **//
-		filler = getConfigMaterial("display.border", filler, 1);
-		arrowUp = getConfigMaterial("display.arrow.up", arrowUp, 1);
-		arrowRight = getConfigMaterial("display.arrow.right", arrowRight, 1);
-		arrowDown = getConfigMaterial("display.arrow.down", arrowDown, 1);
-		arrowLeft = getConfigMaterial("display.arrow.left", arrowLeft, 1);
-		undo = getConfigMaterial("display.undo", undo, 1);
+		//** Get Config materials **//
+		ItemStack filler = config.getDisplayBorder();
+		ItemStack arrowUp = config.getDisplayArrowUp();
+		ItemStack arrowRight = config.getDisplayArrowRight();
+		ItemStack arrowDown = config.getDisplayArrowDown();
+		ItemStack arrowLeft = config.getDisplayArrowLeft();
+		ItemStack undo = config.getDisplayUndo();
 		//** Add tooltips **//
 		changeDisplayName(arrowUp, ChatColor.GREEN + config.getPhrase("display-up"));
 		changeDisplayName(arrowRight, ChatColor.GREEN + config.getPhrase("display-right"));
@@ -79,25 +69,6 @@ public class InventoryDisplay {
 		contents[i] = contents[i+5] = filler; i+=COLS;
 		contents[i] = contents[i+1] = contents[i+4] = contents[i+5] = filler;
 		contents[i+2] = contents[i+3] = arrowDown;
-	}
-
-	/**
-	 * Reads a Material as ItemStack from the configuration
-	 * @param configKey
-	 * @param def Default value
-	 * @param amount Amount of items in the ItemStack
-	 * @return
-	 */
-	private ItemStack getConfigMaterial(String configKey, ItemStack def, int amount){
-		//Read material name
-		String materialName = config.getJPConfig().getString(configKey + "-material", null);
-		if(materialName == null){ return def; }
-		//Match material
-		Material match = Material.matchMaterial(materialName);
-		if(match == null){ return def; }
-		//Set metadata
-		short metadata = (short) config.getJPConfig().getInt(configKey + "-metadata", 0);
-		return new ItemStack(match, amount, metadata);
 	}
 
 	/**
@@ -120,11 +91,12 @@ public class InventoryDisplay {
 		long score = gameState.getScore();
 		while(score > 0){
 			int digit = (int)(score % 10);
-			if(digit == 0){
-				result.add(getConfigMaterial("display.zero", new ItemStack(zeroMaterial), 1));
-			} else {
-				result.add(getConfigMaterial("display.score", new ItemStack(scoreMaterial, digit), digit));
-			}
+//			if(digit == 0){
+//				result.add(getConfigMaterial("display.zero", new ItemStack(zeroMaterial), 1));
+//			} else {
+//				result.add(getConfigMaterial("display.score", new ItemStack(scoreMaterial, digit), digit));
+//			}
+			result.add(config.getDisplayScoreDigit(digit));
 			score /= 10;
 		}
 		return result;
@@ -156,7 +128,7 @@ public class InventoryDisplay {
 			s = new ItemStack(Material.WOOL, 1, calculateColor(value));
 		}
 		//Get Material from config (or set default)
-		s = getConfigMaterial("display.tile." + value, s, s.getAmount());
+		s = config.getDisplayTile(value, s);
 		//Does not work (will using this as soon as it works):
 		//s.setData(new Wool(DyeColor.values()[value / 4]));
 		changeDisplayName(s, ChatColor.DARK_GREEN +
@@ -168,6 +140,7 @@ public class InventoryDisplay {
 	 * Create the inventory content, which shows the game board
 	 */
 	public void render(){
+		initContents();
 		//4*4 board
 		for(int y = 0; y < IGameState.FIELD_SIZE; ++y){
 			int r = (COLS*(y+1)) + 1;
@@ -180,7 +153,7 @@ public class InventoryDisplay {
 			}
 		}
 		//undo button
-		contents[COLS-2] = (undoable.isUndoable() ? undo : new ItemStack(Material.AIR));
+		contents[COLS-2] = (undoable.isUndoable() ? config.getDisplayUndo() : emptyField);
 		//score display
 		List<ItemStack> score = scoreToDisplay();
 		String stringScore = String.format("%s%s: %d", ChatColor.GOLD, config.getPhrase("display-score"), gameState.getScore());
