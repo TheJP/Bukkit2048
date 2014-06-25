@@ -37,9 +37,11 @@ public interface IPersistencer {
 	void read(IGameState gameState, String itemName) throws IOException;
 	/**
 	 * Replaces the current save with its backup to undo the last write action.
+	 * @param itemName Name of the item, which should be undone
+	 * @param unlimited False=undo counter should be decreased, true otherwise
 	 * @throws IOException
 	 */
-	void undo(String itemName) throws IOException;
+	void undo(String itemName, boolean unlimited) throws IOException;
 	/**
 	 * Checks if the Item with given identifier is available.
 	 * @param itemName Name of the searched item

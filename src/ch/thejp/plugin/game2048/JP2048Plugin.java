@@ -29,6 +29,7 @@ import ch.thejp.plugin.game2048.logic.IGameLogic;
 import ch.thejp.plugin.game2048.logic.IGameState;
 import ch.thejp.plugin.game2048.storage.FilePersistencer;
 import ch.thejp.plugin.game2048.storage.IPersistencer;
+import ch.thejp.plugin.game2048.storage.IUndoable;
 import ch.thejp.plugin.game2048.storage.PersistenceUndoable;
 
 /**
@@ -50,6 +51,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 	private Permission permissionPlay;
 	private Permission permissionNew;
 	private Permission permissionStats;
+	private Permission permissionUnlimitedUndo;
 	private final String configFilename = "plugins/JP2048.yml";
 	private Configuration config = null;
 	private String langSection = "";
@@ -166,8 +168,9 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 			//Create Display
 			Inventory inventory = getServer().createInventory(
 					player, InventoryDisplay.COLS*InventoryDisplay.ROWS, getPhrase("game-title"));
-			InventoryDisplay display = new InventoryDisplay(inventory, gameState, gameMode, this, 
-				new PersistenceUndoable(gameState, persistencer, player.getName(), getLogger()));
+			//Adapter, which allows the inventory view to undo turns
+			IUndoable undoable = new PersistenceUndoable(gameState, persistencer, player.getName(), getLogger(), player.hasPermission(permissionUnlimitedUndo));
+			InventoryDisplay display = new InventoryDisplay(inventory, gameState, gameMode, this, undoable);
 			display.render();
 			InventoryView inventoryView = player.openInventory(inventory); //Open Display
 			games.put(player.getName(), new PlayerGame(inventoryView, gameLogic, display)); //Save PlayerGame in RAM
@@ -218,6 +221,7 @@ public class JP2048Plugin extends JavaPlugin implements Listener, IConfiguration
 		permissionPlay = new Permission(config.getString("perm.play", "thejp.2048.play"));
 		permissionNew = new Permission(config.getString("perm.new", "thejp.2048.new"));
 		permissionStats = new Permission(config.getString("perm.stats", "thejp.2048.stats"));
+		permissionUnlimitedUndo = new Permission(config.getString("perm.unlimited-undo", "thejp.2048.undo.unlimited"));
 		//Create Persistencer
 		String storagePath = config.getString("storage.path", "plugins/JP2048/");
 		File storage = new File(storagePath);

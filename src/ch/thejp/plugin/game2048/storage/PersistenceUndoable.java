@@ -17,17 +17,21 @@ public class PersistenceUndoable implements IUndoable {
 	private IPersistencer persistencer;
 	private String itemName;
 	private Logger logger;
+	private boolean unlimited;
 
 	/**
+	 * @param gameState Game state in which the undo should be procesed
 	 * @param persistencer IPersistencer to adapt
 	 * @param itemName Item, to which this adapter belongs
 	 * @param logger Logger, to log IOExceptions into
+	 * @param unlimited true=the player has unlimited undo operations, false otherwise
 	 */
-	public PersistenceUndoable(IGameState gameState, IPersistencer persistencer, String itemName, Logger logger) {
+	public PersistenceUndoable(IGameState gameState, IPersistencer persistencer, String itemName, Logger logger, boolean unlimited) {
 		this.gameState = gameState;
 		this.persistencer = persistencer;
 		this.itemName = itemName;
 		this.logger = logger;
+		this.unlimited = unlimited;
 	}
 
 	@Override
@@ -39,7 +43,7 @@ public class PersistenceUndoable implements IUndoable {
 	public void undo() {
 		try {
 			//Load backup file
-			persistencer.undo(itemName);
+			persistencer.undo(itemName, unlimited);
 			//Read backup file
 			persistencer.read(gameState, itemName);
 		}

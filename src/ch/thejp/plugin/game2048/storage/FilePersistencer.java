@@ -85,7 +85,7 @@ public class FilePersistencer implements IPersistencer {
 	}
 
 	@Override
-	public void undo(String itemName) throws IOException {
+	public void undo(String itemName, boolean unlimited) throws IOException {
 		File file = new File(path + itemName + ending);
 		File bakFile = new File(file.getCanonicalPath() + BACKUP_ENDING);
 		//Replace current file with backup
