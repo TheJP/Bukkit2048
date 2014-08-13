@@ -13,9 +13,9 @@ public class PlayerGame {
 	private InventoryView inventoryView;
 	private IGameLogic gameLogic;
 	private InventoryDisplay display;
+
 	public PlayerGame(InventoryView inventoryView, IGameLogic gameLogic,
 			InventoryDisplay display) {
-		super();
 		this.inventoryView = inventoryView;
 		this.gameLogic = gameLogic;
 		this.display = display;
@@ -39,3 +39,4 @@ public class PlayerGame {
 		this.display = display;
 	}
 }
+

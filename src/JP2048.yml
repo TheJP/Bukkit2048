@@ -83,8 +83,16 @@ lang:
 callback:
   cmd:
     play:
+#   play: tell admin hi
     new:
     stats:
+  score:
+    scores:
+#examples:
+#     - 1000
+#     - 5000
+#   1000: tell admin <player> has reached 1000 points
+#   5000: tell admin <player> has reached 5000 points
 
 #This section allows to change displayed inventory items
 #If no custom materials are specified here, defaults will be used

@@ -1,6 +1,7 @@
 name: JP2048
 main: ch.thejp.plugin.game2048.JP2048Plugin
 version: 2.3.0
+author: JP
 commands:
   2048:
     description: Open game
